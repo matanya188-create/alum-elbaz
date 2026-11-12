@@ -190,6 +190,13 @@ MAIN = '''
 
 '''
 
+PROOF = '''<aside class="proof" id="proof" aria-label="המלצות לקוחות" data-i18n-label="pf.label" hidden>
+  <span class="pf-av" aria-hidden="true"></span>
+  <div class="pf-tx"><p class="pf-1"></p><p class="pf-2"></p></div>
+  <button type="button" class="pf-x" aria-label="סגירת ההמלצות" data-i18n-label="pf.close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</aside>
+'''
+
 DOC = '''
 <main id="main" class="doc">
   <div class="wrap">
@@ -212,7 +219,7 @@ DOC = '''
 
 index = (HEAD.format(title=T1, desc=D1, tk="") + nav(True)
          + MAIN.format(hero=pic("hero", eager=True), wa=WA, tiles=tiles, facts=li(FACTS), gal=gal, steps=li(STEPS), endimg=pic("contact"))
-         + TAIL.format(wa=WA))
+         + PROOF + TAIL.format(wa=WA))
 acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"')
        + nav(False) + DOC + TAIL.format(wa=WA))
 io.open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8", newline="\n").write(index)

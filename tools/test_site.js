@@ -22,7 +22,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   }
   const scrollAll = async p => { await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { scrollTo({ top: y, behavior: "instant" }); await new Promise(r => setTimeout(r, 120)); } scrollTo({ top: document.body.scrollHeight, behavior: "instant" }); await new Promise(r => setTimeout(r, 300)); scrollTo({ top: 0, behavior: "instant" }); }); await sleep(1300); };
   const overflow = p => p.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, cut: [...document.querySelectorAll("a,button,h1,h2,h3,p,li")].filter(e => { if (e.closest("[hidden]")) return false; const r = e.getBoundingClientRect(); return r.width > 0 && (r.left < -1 || r.right > innerWidth + 1); }).map(e => e.tagName + ":" + e.textContent.trim().slice(0, 20)).slice(0, 4) }));
-  const axe = async (p, tag) => { await p.evaluate(axeSrc); const r = await p.evaluate(async () => { const r = await axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] } }); return r.violations.map(v => v.id + " (" + v.nodes.length + "): " + v.nodes.slice(0, 2).map(n => n.target.join(" ")).join(" | ")); }); check("נגישות axe (WCAG A+AA) " + tag, r.length === 0, r); };
+  const axe = async (p, tag, skip) => { await p.evaluate(axeSrc); const r = await p.evaluate(async skip => { const r = await axe.run(skip ? { exclude: [skip] } : document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] } }); return r.violations.map(v => v.id + " (" + v.nodes.length + "): " + v.nodes.slice(0, 2).map(n => n.target.join(" ")).join(" | ")); }, skip || null); check("נגישות axe (WCAG A+AA) " + tag, r.length === 0, r); };
 
   // ----- שפות ורוחב מסכים -----
   for (const lang of ["he", "en", "fr"]) for (const [w, h] of [[320, 640], [390, 844], [768, 1024], [1440, 900]]) {
@@ -127,6 +127,35 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     if (lang === "he") { await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_desk.png") }); await p.screenshot({ path: path.join(SHOTS, "site_full_he.png"), fullPage: true }); }
     await p.browserContext().close(); }
   p = await open("index.html", 390, 844); await scrollAll(p); await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_mob.png") }); await p.browserContext().close();
+  // ----- הודעות המלצה קופצות -----
+  p = await open("index.html", 390, 844); await scrollAll(p); await sleep(3000);
+  s = await p.evaluate(() => { const b = document.getElementById("proof"); return { on: b.classList.contains("on"), t: b.textContent.replace(/\s+/g, " ").trim(), demo: !!b.querySelector(".pf-demo") }; });
+  check("האתר הרגיל: קופצים רק הלקוחות האמיתיים, בלי תווית דוגמה ובלי שמות מומצאים", s.on && !s.demo && /ד\.ט\. מקריית נטפים|מועצה מקומית קדומים/.test(s.t) && !/הוד השרון|רעננה/.test(s.t), s);
+  await p.browserContext().close();
+  for (const [lang, w] of [["he", 390], ["fr", 1440], ["en", 320]]) {
+    p = await open("index.html?proof=demo&lang=" + lang, w, 800);
+    check("הדגמה " + lang + ": לפני גלילה אין הודעה", await p.evaluate(() => document.getElementById("proof").hidden));
+    await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(2600);
+    s = await p.evaluate(() => { const b = document.getElementById("proof"), r = b.getBoundingClientRect(), a = document.querySelector(".fab.acc").getBoundingClientRect(), wa = document.querySelector(".fab.wa").getBoundingClientRect(); const hit = q => !(r.right < q.left || r.left > q.right || r.bottom < q.top || r.top > q.bottom); return { on: !b.hidden && b.classList.contains("on"), t1: b.querySelector(".pf-1").textContent, t2: b.querySelector(".pf-2").textContent, demo: !!b.querySelector(".pf-demo"), fixed: getComputedStyle(b).position, inView: r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight && r.top >= 0, left: r.left < innerWidth / 2, hitAcc: hit(a), hitWa: hit(wa), lines: Math.round(b.querySelector(".pf-1").getBoundingClientRect().height) }; });
+    check("הדגמה " + lang + ": אחרי גלילה קופצת הודעה נעוצה, בתוך המסך, מסומנת 'דוגמה', ולא מכסה את הכפתורים הצפים", s.on && s.demo && s.fixed === "fixed" && s.inView && !s.hitAcc && !s.hitWa && s.t1.length > 12 && s.t2.length > 5 && (lang === "he" ? /הזמין |הזמינה /.test(s.t1) && s.left : !/[א-ת]/.test(s.t1 + s.t2)), s);
+    if (lang === "he") { await axe(p, "עם הודעת המלצה פתוחה", ".hero"); await p.screenshot({ path: path.join(SHOTS, "site_proof_mob.png") }); }
+    if (lang === "fr") await p.screenshot({ path: path.join(SHOTS, "site_proof_desk_fr.png") });
+    if (lang === "he") {
+      const first = s.t1; await sleep(6800);
+      check("ההודעה נעלמת אחרי כ-6 שניות", await p.evaluate(() => document.getElementById("proof").hidden));
+      await sleep(5600);
+      const s2 = await p.evaluate(() => ({ on: document.getElementById("proof").classList.contains("on"), t1: document.querySelector(".pf-1").textContent }));
+      check("אחרי הפסקה קופצת הודעה של לקוח אחר", s2.on && s2.t1 !== first, s2);
+      await p.click(".pf-x"); await sleep(900);
+      check("לחיצה על X סוגרת", await p.evaluate(() => document.getElementById("proof").hidden));
+      await p.reload({ waitUntil: "networkidle0" }); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
+      check("אחרי X ההודעות לא חוזרות באותו ביקור", await p.evaluate(() => document.getElementById("proof").hidden));
+    }
+    await p.browserContext().close();
+  }
+  p = await open("index.html?proof=demo", 390, 844, { reduce: true }); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
+  check("מכשיר שמבקש פחות תנועה: אין הודעות קופצות", await p.evaluate(() => document.getElementById("proof").hidden));
+  await p.browserContext().close();
   // ----- לוגו -----
   for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);
     s = await p.evaluate(() => { const m = document.querySelector(".logo img"), f = document.querySelector("footer .brand img"), r = m.getBoundingClientRect(); return { mark: m.complete && m.naturalWidth > 0, h: Math.round(r.height), inNav: r.top >= 0 && r.bottom <= 80, full: f.complete && f.naturalWidth > 0, fw: Math.round(f.getBoundingClientRect().width), name: document.querySelector(".logo").textContent.trim() }; });
