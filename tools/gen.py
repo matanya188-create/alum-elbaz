@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # מייצר את index.html ואת accessibility.html מאותם חלקים משותפים (ראש, ניווט, תחתית).
 # הרצה: python tools/gen.py  (מתוך תיקיית האתר)
-import io, os, json
+import io, os, json, hashlib
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WA = "https://wa.me/972543547192"
 
@@ -23,8 +23,8 @@ HEAD = '''<!DOCTYPE html>
 <link rel="apple-touch-icon" href="favicon.png">
 <link rel="preload" href="fonts/plex-hebrew-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<link rel="stylesheet" href="styles.css">
-<script src="boot.js"></script>
+<link rel="stylesheet" href="styles.css?v={vcss}">
+<script src="boot.js?v={vboot}"></script>
 </head>
 <body>
 <a class="skip" href="#main" data-i18n="skip">דילוג לתוכן הראשי</a>
@@ -72,10 +72,14 @@ TAIL = '''<footer><div class="wrap brand"><img src="assets/logo-full.png" width=
     <button type="button" data-opt="close"><span data-i18n="acc.close">סגירה</span></button>
   </div>
 </div>
-<script src="site.js" defer></script>
+<script src="site.js?v={vsite}" defer></script>
 </body>
 </html>
 '''
+
+
+def ver(name):
+    return hashlib.md5(open(os.path.join(ROOT, name), "rb").read()).hexdigest()[:8]
 
 
 def nav(home):
@@ -217,11 +221,11 @@ DOC = '''
 
 '''
 
-index = (HEAD.format(title=T1, desc=D1, tk="") + nav(True)
+index = (HEAD.format(title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver("boot.js")) + nav(True)
          + MAIN.format(hero=pic("hero", eager=True), wa=WA, tiles=tiles, facts=li(FACTS), gal=gal, steps=li(STEPS), endimg=pic("contact"))
-         + PROOF + TAIL.format(wa=WA))
-acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"')
-       + nav(False) + DOC + TAIL.format(wa=WA))
+         + PROOF + TAIL.format(wa=WA, vsite=ver("site.js")))
+acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
+       + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
 io.open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8", newline="\n").write(index)
 io.open(os.path.join(ROOT, "accessibility.html"), "w", encoding="utf-8", newline="\n").write(acc)
 print("ok", len(index), len(acc))

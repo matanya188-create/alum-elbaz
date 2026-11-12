@@ -8,6 +8,16 @@
     history.scrollRestoration = "manual";
     var inner = document.referrer && document.referrer.indexOf(location.origin + "/") === 0;
     if (location.hash && !inner) history.replaceState(null, "", location.pathname + location.search);
+    /* שומר: בשנייה וחצי הראשונות, כל גלילה שלא באה מהגולש עצמו (דפדפן פנימי של WhatsApp, קישור עם הדגשת טקסט,
+       שחזור מיקום) מוחזרת לראש הדף. מגע, גלגלת או מקלדת מבטלים את השומר מיד. */
+    if (!(inner && location.hash)) {
+      var guard = true, stop = function () { guard = false; };
+      var top = function () { if (guard && (window.pageYOffset || d.scrollTop) > 0) window.scrollTo({ top: 0, left: 0, behavior: "instant" }); };
+      ["touchstart", "wheel", "keydown", "mousedown", "pointerdown"].forEach(function (ev) { window.addEventListener(ev, stop, { capture: true, passive: true, once: true }); });
+      window.addEventListener("scroll", top, { passive: true });
+      document.addEventListener("DOMContentLoaded", top); window.addEventListener("load", top); window.addEventListener("pageshow", top);
+      setTimeout(function () { top(); guard = false; window.removeEventListener("scroll", top); }, 1500);
+    }
   } catch (e) {}
   try {
     var q = new URLSearchParams(location.search).get("lang");

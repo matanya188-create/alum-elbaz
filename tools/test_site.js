@@ -18,7 +18,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     p.on("console", m => { if (m.type() === "error") errors.push("console " + m.text()); });
     p.on("requestfailed", r => errors.push("reqfail " + r.url()));
     p.on("response", r => { if (r.status() >= 400) errors.push(r.status() + " " + r.url()); });
-    await p.goto(BASE + url, { waitUntil: "networkidle0" }); return p;
+    await p.goto(BASE + url, { waitUntil: "networkidle0" }); await sleep(1600); return p;
   }
   const scrollAll = async p => { await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { scrollTo({ top: y, behavior: "instant" }); await new Promise(r => setTimeout(r, 120)); } scrollTo({ top: document.body.scrollHeight, behavior: "instant" }); await new Promise(r => setTimeout(r, 300)); scrollTo({ top: 0, behavior: "instant" }); }); await sleep(1300); };
   const overflow = p => p.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, cut: [...document.querySelectorAll("a,button,h1,h2,h3,p,li")].filter(e => { if (e.closest("[hidden]")) return false; const r = e.getBoundingClientRect(); return r.width > 0 && (r.left < -1 || r.right > innerWidth + 1); }).map(e => e.tagName + ":" + e.textContent.trim().slice(0, 20)).slice(0, 4) }));
@@ -137,6 +137,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.reload({ waitUntil: "networkidle0" }); await sleep(1200);
   check("רענון באמצע הדף: נפתח שוב מלמעלה", (await p.evaluate(() => Math.round(scrollY))) === 0);
   await p.browserContext().close();
+  // גלילה שלא באה מהגולש מיד אחרי הטעינה (כמו בדפדפן הפנימי של WhatsApp) מוחזרת למעלה
+  { const ctx = await browser.createBrowserContext(); const q = await ctx.newPage(); await q.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+    await q.evaluateOnNewDocument(() => { const jump = () => { const el = document.getElementById("projects"); if (el) el.scrollIntoView(); }; document.addEventListener("DOMContentLoaded", () => { jump(); setTimeout(jump, 300); setTimeout(jump, 800); }); });
+    await q.goto(BASE + "index.html", { waitUntil: "networkidle0" }); await sleep(1900);
+    const y = await q.evaluate(() => Math.round(scrollY));
+    check("קפיצה אוטומטית לעבודות מיד אחרי הטעינה: הדף חוזר לראש", y === 0, y);
+    await q.touchscreen.tap(200, 400); await q.evaluate(() => scrollTo({ top: 1500, behavior: "instant" })); await sleep(400);
+    check("אחרי השומר הגולש גולל חופשי", (await q.evaluate(() => Math.round(scrollY))) === 1500);
+    const c2 = await browser.createBrowserContext(); const q2 = await c2.newPage(); await q2.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+    await q2.goto(BASE + "index.html", { waitUntil: "domcontentloaded" }); await q2.touchscreen.tap(200, 400); await q2.evaluate(() => scrollTo({ top: 900, behavior: "instant" })); await sleep(900);
+    check("גולש שנוגע במסך מיד עם הטעינה: השומר לא מחזיר אותו למעלה", (await q2.evaluate(() => Math.round(scrollY))) === 900);
+    await c2.close();
+    await ctx.close(); }
   p = await open("accessibility.html", 390, 844); await p.click(".menu-btn"); await sleep(200);
   await Promise.all([p.waitForNavigation({ waitUntil: "networkidle0" }), p.click('#mnav a[href="index.html#contact"]')]); await sleep(1500);
   s = await p.evaluate(() => ({ top: Math.round(document.getElementById("contact").getBoundingClientRect().top), y: Math.round(scrollY) }));
@@ -163,7 +176,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       check("אחרי הפסקה קופצת הודעה של לקוח אחר", s2.on && s2.t1 !== first, s2);
       await p.click(".pf-x"); await sleep(900);
       check("לחיצה על X סוגרת", await p.evaluate(() => document.getElementById("proof").hidden));
-      await p.reload({ waitUntil: "networkidle0" }); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
+      await p.reload({ waitUntil: "networkidle0" }); await sleep(1600); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
       check("אחרי X ההודעות לא חוזרות באותו ביקור", await p.evaluate(() => document.getElementById("proof").hidden));
     }
     await p.browserContext().close();
