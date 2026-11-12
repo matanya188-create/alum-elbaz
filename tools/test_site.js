@@ -127,6 +127,21 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     if (lang === "he") { await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_desk.png") }); await p.screenshot({ path: path.join(SHOTS, "site_full_he.png"), fullPage: true }); }
     await p.browserContext().close(); }
   p = await open("index.html", 390, 844); await scrollAll(p); await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_mob.png") }); await p.browserContext().close();
+  // ----- כניסה לאתר מתחילה מלמעלה -----
+  p = await open("index.html#projects", 390, 844); await sleep(1200);
+  s = await p.evaluate(() => ({ y: Math.round(scrollY), hash: location.hash }));
+  check("כניסה עם #projects בכתובת (נשאר מלחיצה קודמת): הדף נפתח מלמעלה והכתובת מתנקה", s.y === 0 && s.hash === "", s);
+  await p.click(".hero .btn.ghost"); await sleep(1500);
+  s = await p.evaluate(() => ({ top: Math.round(document.getElementById("projects").getBoundingClientRect().top), hash: location.hash }));
+  check("לחיצה על 'לפרויקטים שלנו': גולל לעבודות, בלי להשאיר # בכתובת", Math.abs(s.top) < 90 && s.hash === "", s);
+  await p.reload({ waitUntil: "networkidle0" }); await sleep(1200);
+  check("רענון באמצע הדף: נפתח שוב מלמעלה", (await p.evaluate(() => Math.round(scrollY))) === 0);
+  await p.browserContext().close();
+  p = await open("accessibility.html", 390, 844); await p.click(".menu-btn"); await sleep(200);
+  await Promise.all([p.waitForNavigation({ waitUntil: "networkidle0" }), p.click('#mnav a[href="index.html#contact"]')]); await sleep(1500);
+  s = await p.evaluate(() => ({ top: Math.round(document.getElementById("contact").getBoundingClientRect().top), y: Math.round(scrollY) }));
+  check("מעמוד ההצהרה ל'צור קשר': כן מגיע לסעיף", s.y > 500 && Math.abs(s.top) < 120, s);
+  await p.browserContext().close();
   // ----- הודעות המלצה קופצות -----
   p = await open("index.html", 390, 844); await scrollAll(p); await sleep(3000);
   s = await p.evaluate(() => { const b = document.getElementById("proof"); return { on: b.classList.contains("on"), t: b.textContent.replace(/\s+/g, " ").trim(), demo: !!b.querySelector(".pf-demo") }; });

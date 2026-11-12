@@ -129,6 +129,18 @@
   each(".langs button", function (b) { b.addEventListener("click", function () { setLang(b.getAttribute("data-lang"), true); }); });
   setLang(AE.lang, false);
 
+  /* ---- קישורים פנימיים: גוללים לסעיף בלי להשאיר #סעיף בכתובת (אחרת כניסה חוזרת קופצת לשם) ---- */
+  each('a[href^="#"]', function (a) {
+    a.addEventListener("click", function (e) {
+      var el = document.getElementById(a.getAttribute("href").slice(1)); if (!el) return;
+      e.preventDefault();
+      var calm = d.classList.contains("nomo") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+      el.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
+      if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+      el.focus({ preventScroll: true });
+    });
+  });
+
   /* ---- תפריט בטלפון ---- */
   var mb = document.querySelector(".menu-btn"), mn = document.getElementById("mnav");
   if (mb && mn) {
