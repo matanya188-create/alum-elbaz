@@ -29,9 +29,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 /* ניווט */
 .nav{position:absolute;inset-inline:0;top:0;z-index:5}
-.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:72px}
-.logo{font-weight:700;font-size:1.25rem}
-.logo span{font-weight:300;color:var(--muted)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:80px}
+.logo{display:flex;align-items:center;gap:12px;direction:ltr}
+.logo img{width:auto;height:52px;object-fit:contain}
+.logo .wm{font-size:1.08rem;font-weight:400;letter-spacing:.26em;white-space:nowrap;color:#dfe2e5}
+@media (max-width:420px){.logo .wm{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 .nav .links{display:none;gap:30px;font-size:.95rem;color:#c9ced3}
 .nav .links a:hover{color:var(--text)}
 .nav .side{display:flex;align-items:center;gap:6px}
@@ -100,6 +102,8 @@ h2{font-size:clamp(1.7rem,5.4vw,2.7rem);line-height:1.15;font-weight:600;letter-
 .end address{font-style:normal;margin-top:22px;color:var(--muted);display:grid;gap:4px}
 .end address a{justify-self:start;color:var(--text);text-decoration:underline;text-underline-offset:4px}
 footer{border-top:1px solid var(--line);padding-block:28px 96px;color:var(--muted);font-size:.9rem}
+footer .brand{justify-content:center;padding-block:28px 36px}
+footer .brand img{width:min(230px,60vw);height:auto;object-fit:contain}
 footer .wrap{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:space-between}
 footer a{text-decoration:underline;text-underline-offset:4px}
 

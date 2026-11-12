@@ -120,6 +120,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.browserContext().close();
   }
 
+  // ----- לוגו -----
+  for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);
+    s = await p.evaluate(() => { const m = document.querySelector(".logo img"), f = document.querySelector("footer .brand img"), r = m.getBoundingClientRect(); return { mark: m.complete && m.naturalWidth > 0, h: Math.round(r.height), inNav: r.top >= 0 && r.bottom <= 80, full: f.complete && f.naturalWidth > 0, fw: Math.round(f.getBoundingClientRect().width), name: document.querySelector(".logo").textContent.trim() }; });
+    check("לוגו ברוחב " + w + ": הסמל בניווט והלוגו המלא בתחתית נטענים", s.mark && s.h === 52 && s.inNav && s.full && s.fw >= 180 && s.name === "ALUM ELBAZ", s);
+    if (w === 1440) { await p.evaluate(() => scrollTo({ top: document.body.scrollHeight, behavior: "instant" })); await sleep(500); await p.screenshot({ path: path.join(SHOTS, "site_footer_logo.png") }); }
+    await p.browserContext().close(); }
   // ----- קישורים ואבטחה -----
   p = await open("index.html", 1440, 900);
   s = await p.evaluate(() => ({ ext: [...document.querySelectorAll('a[target="_blank"]')].map(a => a.rel + " " + a.href), wa: [...document.querySelectorAll('a[href^="https://wa.me/"]')].length, tel: document.querySelector('a[href^="tel:"]').getAttribute("href"), inlineScripts: [...document.scripts].filter(x => !x.src).length, inlineStyle: document.querySelectorAll("[style]").length, forms: document.forms.length, extRes: performance.getEntriesByType("resource").map(r => r.name).filter(n => !n.startsWith(location.origin)), csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]').content }));

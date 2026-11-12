@@ -9,7 +9,7 @@
     en: {
       "title": "Alum Elbaz | Premium aluminium windows, doors and glazing",
       "desc": "Alum Elbaz Ltd. designs, manufactures and installs aluminium windows, doors, glazed walls, winter enclosures and shutters across Israel.",
-      "logo": "Alum Elbaz <span>Ltd.</span>", "skip": "Skip to main content", "menu": "Menu",
+      "skip": "Skip to main content", "menu": "Menu",
       "nav.what": "What we do", "nav.projects": "Projects", "nav.process": "Process", "nav.contact": "Contact",
       "cta.quote": "Get a quote", "cta.projects": "See our projects",
       "hero.h1": "Aluminium <em>finished to the standard</em> of a luxury home.",
@@ -55,7 +55,7 @@
     fr: {
       "title": "Alum Elbaz | Fenêtres, portes et baies vitrées en aluminium haut de gamme",
       "desc": "Alum Elbaz Ltd. conçoit, fabrique et installe des fenêtres, portes, baies vitrées, fermetures d'hiver et volets en aluminium dans tout Israël.",
-      "logo": "Alum Elbaz <span>Ltd.</span>", "skip": "Aller au contenu principal", "menu": "Menu",
+      "skip": "Aller au contenu principal", "menu": "Menu",
       "nav.what": "Nos réalisations", "nav.projects": "Projets", "nav.process": "Méthode", "nav.contact": "Contact",
       "cta.quote": "Demander un devis", "cta.projects": "Voir nos projets",
       "hero.h1": "L'aluminium, <em>avec la finition</em> d'une maison de luxe.",

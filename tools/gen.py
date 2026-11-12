@@ -19,7 +19,8 @@ HEAD = '''<!DOCTYPE html>
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/hero-1600.jpg">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
 <link rel="preload" href="fonts/plex-hebrew-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="styles.css">
@@ -37,7 +38,7 @@ LINKS = '''      <li><a href="{h}#services" data-i18n="nav.what">מה אנחנו
 
 NAV = '''<header class="nav">
   <div class="wrap">
-    <a class="logo" href="{h}#top" data-i18n-html="logo">אלום אלבז <span>בע״מ</span></a>
+    <a class="logo" href="{h}#top"><img src="assets/logo-mark.png" width="206" height="176" alt=""><span class="wm" lang="en">ALUM ELBAZ</span></a>
     <nav aria-label="תפריט" data-i18n-label="menu"><ul class="links">
 {links}    </ul></nav>
     <div class="side">
@@ -55,7 +56,7 @@ NAV = '''<header class="nav">
 </header>
 '''
 
-TAIL = '''<footer><div class="wrap"><span>&copy; 2026 <span data-i18n="foot.co">אלום אלבז בע״מ</span></span><a href="accessibility.html" data-keep-lang data-i18n="foot.a11y">הצהרת נגישות</a></div></footer>
+TAIL = '''<footer><div class="wrap brand"><img src="assets/logo-full.png" width="656" height="560" alt="Alum Elbaz Ltd." loading="lazy" decoding="async"></div><div class="wrap"><span>&copy; 2026 <span data-i18n="foot.co">אלום אלבז בע״מ</span></span><a href="accessibility.html" data-keep-lang data-i18n="foot.a11y">הצהרת נגישות</a></div></footer>
 
 <a class="fab wa" href="{wa}" target="_blank" rel="noopener noreferrer" aria-label="שלחו לנו הודעה ב-WhatsApp" data-i18n-label="wa.label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.600 15.100L2 22l5-1.300A10 10 0 1 0 12 2Zm0 18.200a8.200 8.200 0 0 1-4.200-1.200l-.300-.200-3 .800.800-2.900-.200-.300A8.200 8.200 0 1 1 12 20.200Zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800s-.400-.100-.600.100-.600.800-.800 1-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.600-1.200a.400.400 0 0 0 0-.400c-.100-.100-.600-1.400-.800-1.900s-.400-.400-.600-.400h-.500a1 1 0 0 0-.700.300 2.900 2.900 0 0 0-.900 2.200 5 5 0 0 0 1.100 2.700 11.500 11.500 0 0 0 4.400 3.900c1.600.700 2.300.800 3.100.600a2.600 2.600 0 0 0 1.700-1.200 2.100 2.100 0 0 0 .200-1.200c-.100-.100-.300-.200-.500-.300Z"/></svg></a>
 <button type="button" class="fab acc" aria-expanded="false" aria-controls="acc-panel" aria-label="תפריט נגישות" data-i18n-label="acc.open"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.500" r="2"/><path d="M20 8.500c-2.700.700-5.300 1-8 1s-5.300-.300-8-1l.500-1.900c2.500.600 5 .900 7.500.900s5-.300 7.500-.900ZM9.500 10h5v4.500l2 6.500-1.900.600-2.200-6h-.800l-2.200 6-1.900-.600 2-6.500Z"/></svg></button>
