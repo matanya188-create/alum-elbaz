@@ -21,7 +21,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.goto(BASE + url, { waitUntil: "networkidle0" }); return p;
   }
   const scrollAll = async p => { await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { scrollTo({ top: y, behavior: "instant" }); await new Promise(r => setTimeout(r, 120)); } scrollTo({ top: document.body.scrollHeight, behavior: "instant" }); await new Promise(r => setTimeout(r, 300)); scrollTo({ top: 0, behavior: "instant" }); }); await sleep(1300); };
-  const overflow = p => p.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, cut: [...document.querySelectorAll("a,button,h1,h2,h3,p,li")].filter(e => { if (e.closest(".strip") || e.closest("[hidden]")) return false; const r = e.getBoundingClientRect(); return r.width > 0 && (r.left < -1 || r.right > innerWidth + 1); }).map(e => e.tagName + ":" + e.textContent.trim().slice(0, 20)).slice(0, 4) }));
+  const overflow = p => p.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, cut: [...document.querySelectorAll("a,button,h1,h2,h3,p,li")].filter(e => { if (e.closest("[hidden]")) return false; const r = e.getBoundingClientRect(); return r.width > 0 && (r.left < -1 || r.right > innerWidth + 1); }).map(e => e.tagName + ":" + e.textContent.trim().slice(0, 20)).slice(0, 4) }));
   const axe = async (p, tag) => { await p.evaluate(axeSrc); const r = await p.evaluate(async () => { const r = await axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] } }); return r.violations.map(v => v.id + " (" + v.nodes.length + "): " + v.nodes.slice(0, 2).map(n => n.target.join(" ")).join(" | ")); }); check("נגישות axe (WCAG A+AA) " + tag, r.length === 0, r); };
 
   // ----- שפות ורוחב מסכים -----
@@ -120,6 +120,13 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.browserContext().close();
   }
 
+  // ----- עבודות לפי תחום -----
+  for (const lang of ["he", "fr"]) { p = await open("index.html?lang=" + lang, 1440, 900); await scrollAll(p);
+    s = await p.evaluate(() => { const im = [...document.querySelectorAll("img")]; const ci = [...document.querySelectorAll(".cat img")]; return { cats: document.querySelectorAll(".cat").length, pics: ci.length, broken: im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.src), noAlt: ci.filter(i => !i.alt || (document.documentElement.lang !== "he" && /[א-ת]/.test(i.alt))).length, old: im.filter(i => /\/(g[1-4]|u\d+)-/.test(i.src)).length, ratio: ci.map(i => { const r = i.getBoundingClientRect(); return Math.round(r.width / r.height * 100); }).filter(x => x !== 80).length }; });
+    check("עבודות " + lang + ": 9 תחומים, 18 תמונות, כולן נטענות, עם תיאור בשפת הדף וביחס אחיד", s.cats === 9 && s.pics === 18 && s.broken.length === 0 && s.noAlt === 0 && s.old === 0 && s.ratio === 0, s);
+    if (lang === "he") { await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_desk.png") }); await p.screenshot({ path: path.join(SHOTS, "site_full_he.png"), fullPage: true }); }
+    await p.browserContext().close(); }
+  p = await open("index.html", 390, 844); await scrollAll(p); await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_mob.png") }); await p.browserContext().close();
   // ----- לוגו -----
   for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);
     s = await p.evaluate(() => { const m = document.querySelector(".logo img"), f = document.querySelector("footer .brand img"), r = m.getBoundingClientRect(); return { mark: m.complete && m.naturalWidth > 0, h: Math.round(r.height), inNav: r.top >= 0 && r.bottom <= 80, full: f.complete && f.naturalWidth > 0, fw: Math.round(f.getBoundingClientRect().width), name: document.querySelector(".logo").textContent.trim() }; });

@@ -26,8 +26,8 @@
       "facts.2t": "Comprehensive warranty", "facts.2p": "On the product and on the installation, with professional support after handover.",
       "facts.3t": "Complex problems solved", "facts.3p": "Unusual openings, renovations and fixing work that went wrong.",
       "facts.4t": "Fast delivery", "facts.4p": "From order to installation, among the fastest lead times in Israel.",
-      "gal.h2": "Selected projects.", "gal.lead": "Sample images. Photos of our own projects will be added soon.",
-      "gal.label": "Project gallery, scroll sideways",
+      "gal.h2": "Our work.", "gal.lead": "A selection of projects we designed, manufactured and installed, by category.",
+      "cat.1": "Windows and glazed walls", "cat.2": "Office doors and partitions", "cat.3": "Pergolas", "cat.4": "Shower enclosures", "cat.5": "Fences and gates", "cat.6": "Shading", "cat.7": "Aluminium cladding", "cat.8": "Handles and hardware", "cat.9": "Pleated insect screens",
       "proc.h2": "From measurement to the finished home.",
       "proc.1t": "On-site measurement", "proc.1p": "We come to you, measure every opening and learn what matters to you.",
       "proc.2t": "Design and quote", "proc.2p": "Together we choose the system, colour and glazing. A clear, itemised quote.",
@@ -44,7 +44,7 @@
       "st.h2a": "What we did",
       "st.la": "<li>The site was built to follow Israeli Standard 5568 at level AA (based on WCAG 2.0).</li><li>Full keyboard navigation, with a visible focus indicator and a skip link.</li><li>Semantic structure for screen readers, in Hebrew, English and French.</li><li>An accessibility menu: larger text, high contrast, highlighted links and stopping animations.</li><li>The site respects the device setting for reduced motion.</li>",
       "st.h2b": "Known limitations",
-      "st.pb": "We keep checking and improving the site. Some content, such as project photos, may still lack a full description. If you found a problem, please tell us and we will fix it.",
+      "st.pb": "We keep checking and improving the site. Project photos are described by category only, not in full detail. If you found a problem, please tell us and we will fix it.",
       "st.h2c": "Accessibility of the service",
       "st.pc": "Our service is provided at the customer's home or site: measurement, consultation and installation take place where you are. You can reach us by phone, WhatsApp or email.",
       "st.h2d": "Accessibility coordinator",
@@ -56,7 +56,7 @@
       "title": "Alum Elbaz | Fenêtres, portes et baies vitrées en aluminium haut de gamme",
       "desc": "Alum Elbaz Ltd. conçoit, fabrique et installe des fenêtres, portes, baies vitrées, fermetures d'hiver et volets en aluminium dans tout Israël.",
       "skip": "Aller au contenu principal", "menu": "Menu",
-      "nav.what": "Nos réalisations", "nav.projects": "Projets", "nav.process": "Méthode", "nav.contact": "Contact",
+      "nav.what": "Nos prestations", "nav.projects": "Projets", "nav.process": "Méthode", "nav.contact": "Contact",
       "cta.quote": "Demander un devis", "cta.projects": "Voir nos projets",
       "hero.h1": "L'aluminium, <em>avec la finition</em> d'une maison de luxe.",
       "hero.p": "Fenêtres, portes, baies vitrées et fermetures d'hiver. Conception, fabrication et pose dans tout Israël, avec un suivi personnel bien après la livraison.",
@@ -72,8 +72,8 @@
       "facts.2t": "Garantie complète", "facts.2p": "Sur le produit et sur la pose, avec un suivi professionnel après la livraison.",
       "facts.3t": "Solutions aux cas complexes", "facts.3p": "Ouvertures hors normes, rénovations et reprise de travaux mal réalisés.",
       "facts.4t": "Livraison rapide", "facts.4p": "De la commande à la pose, parmi les délais les plus courts d'Israël.",
-      "gal.h2": "Projets choisis.", "gal.lead": "Images d'exemple. Les photos de nos propres projets seront ajoutées bientôt.",
-      "gal.label": "Galerie de projets, faites défiler sur le côté",
+      "gal.h2": "Nos réalisations.", "gal.lead": "Une sélection de projets que nous avons conçus, fabriqués et posés, par catégorie.",
+      "cat.1": "Fenêtres et baies vitrées", "cat.2": "Portes et cloisons de bureau", "cat.3": "Pergolas", "cat.4": "Parois de douche", "cat.5": "Clôtures et portails", "cat.6": "Brise-soleil", "cat.7": "Bardage aluminium", "cat.8": "Poignées et quincaillerie", "cat.9": "Moustiquaires plissées",
       "proc.h2": "De la prise de mesures à la maison terminée.",
       "proc.1t": "Mesures sur place", "proc.1p": "Nous venons chez vous, mesurons chaque ouverture et comprenons vos priorités.",
       "proc.2t": "Conception et devis", "proc.2p": "Nous choisissons ensemble le système, la teinte et le vitrage. Un devis clair et détaillé.",
@@ -90,7 +90,7 @@
       "st.h2a": "Ce que nous avons fait",
       "st.la": "<li>Le site a été conçu selon la norme israélienne 5568, niveau AA (fondée sur WCAG 2.0).</li><li>Navigation complète au clavier, avec un indicateur de focus visible et un lien d'évitement.</li><li>Structure sémantique pour les lecteurs d'écran, en hébreu, anglais et français.</li><li>Un menu d'accessibilité : texte plus grand, contraste élevé, liens soulignés et arrêt des animations.</li><li>Le site respecte le réglage de réduction des animations de l'appareil.</li>",
       "st.h2b": "Limites connues",
-      "st.pb": "Nous continuons à vérifier et à améliorer le site. Certains contenus, comme des photos de projets, peuvent encore manquer d'une description complète. Si vous rencontrez un problème, dites-le-nous et nous le corrigerons.",
+      "st.pb": "Nous continuons à vérifier et à améliorer le site. Les photos de projets sont décrites par catégorie seulement, sans description détaillée. Si vous rencontrez un problème, dites-le-nous et nous le corrigerons.",
       "st.h2c": "Accessibilité du service",
       "st.pc": "Notre service est rendu chez le client : les mesures, le conseil et la pose se font sur place. Vous pouvez nous joindre par téléphone, WhatsApp ou e-mail.",
       "st.h2d": "Référent accessibilité",
@@ -108,6 +108,7 @@
   each("[data-i18n]", function (el) { orig.text.set(el, el.textContent); });
   each("[data-i18n-html]", function (el) { orig.html.set(el, el.innerHTML); });
   each("[data-i18n-label]", function (el) { orig.attr.set(el, el.getAttribute("aria-label")); });
+  var heCat = {}; each("h3[data-i18n]", function (el) { heCat[el.getAttribute("data-i18n")] = el.textContent; });
 
   function setLang(lang, save) {
     if (["he", "en", "fr"].indexOf(lang) < 0) lang = "he";
@@ -116,6 +117,7 @@
     each("[data-i18n]", function (el) { var k = el.getAttribute("data-i18n"); el.textContent = dict && dict[k] != null ? dict[k] : orig.text.get(el); });
     each("[data-i18n-html]", function (el) { var k = el.getAttribute("data-i18n-html"); el.innerHTML = dict && dict[k] != null ? dict[k] : orig.html.get(el); });
     each("[data-i18n-label]", function (el) { var k = el.getAttribute("data-i18n-label"); el.setAttribute("aria-label", dict && dict[k] != null ? dict[k] : orig.attr.get(el)); });
+    each("img[data-i18n-alt]", function (el) { var k = el.getAttribute("data-i18n-alt"); el.alt = (dict && dict[k] != null ? dict[k] : heCat[k]) + " " + el.getAttribute("data-n"); });
     var tk = d.getAttribute("data-title-key") || "title";
     document.title = dict && dict[tk] ? dict[tk] : orig.title;
     if (metaDesc) metaDesc.setAttribute("content", dict && dict.desc ? dict.desc : orig.desc);

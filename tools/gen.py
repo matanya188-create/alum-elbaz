@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # מייצר את index.html ואת accessibility.html מאותם חלקים משותפים (ראש, ניווט, תחתית).
 # הרצה: python tools/gen.py  (מתוך תיקיית האתר)
-import io, os
+import io, os, json
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WA = "https://wa.me/972543547192"
 
@@ -83,10 +83,14 @@ def nav(home):
     return NAV.format(h=h, wa=WA, links=LINKS.format(h=h))
 
 
-def pic(n, eager=False, sizes="100vw"):
+MAN = json.load(open(os.path.join(ROOT, "tools", "photos.json")))
+
+
+def pic(n, eager=False, sizes="100vw", alt="", extra=""):
+    m = MAN[n]; big, small = m["s"]
     tail = ' fetchpriority="high"' if eager else ' loading="lazy" decoding="async"'
-    return ('<img src="assets/{n}-800.jpg" srcset="assets/{n}-800.jpg 800w, assets/{n}-1600.jpg 1600w" '
-            'sizes="{s}" width="1600" height="1067" alt=""{t}>').format(n=n, s=sizes, t=tail)
+    return ('<img src="assets/{n}-{sm}.jpg" srcset="assets/{n}-{sm}.jpg {sm}w, assets/{n}-{bg}.jpg {bg}w" '
+            'sizes="{s}" width="{w}" height="{h}" alt="{alt}"{x}{t}>').format(n=n, sm=small, bg=big, s=sizes, w=m["w"], h=m["h"], alt=alt, x=extra, t=tail)
 
 
 def li(items, cls="rv"):
@@ -114,7 +118,16 @@ tiles = "\n".join(
     '      <li class="tile rv"{i}>{img}<div><h3 data-i18n="{k}t">{t}</h3><p data-i18n="{k}p">{p}</p></div></li>'.format(
         i=(' data-i="%d"' % i) if i else "", img=pic(n, sizes="(min-width:860px) 60vw, 100vw"), k=k, t=t, p=p)
     for i, (n, k, t, p) in enumerate(SVC))
-gal = "\n".join('    <figure>%s</figure>' % pic(n, sizes="(min-width:860px) 46vw, 82vw") for n in ["g1", "g2", "g3", "g4"])
+CATS = [("cat.1", "חלונות וויטרינות", "c1"), ("cat.2", "דלתות ומחיצות למשרדים", "c2"), ("cat.3", "פרגולות", "c3"),
+        ("cat.4", "מקלחונים", "c4"), ("cat.5", "גדרות ושערים", "c5"), ("cat.6", "הצללה", "c6"),
+        ("cat.7", "חיפוי אלומיניום", "c7"), ("cat.8", "ידיות ופרזול", "c8"), ("cat.9", "רשתות פליסה", "c9")]
+SZ = "(min-width:860px) 16vw, 46vw"
+gal = "\n".join(
+    '      <li class="cat rv"><h3 data-i18n="{k}">{t}</h3><div class="pair">{a}{b}</div></li>'.format(
+        k=k, t=t_,
+        a=pic(c + "a", sizes=SZ, alt=t_ + " 1", extra=' data-i18n-alt="%s" data-n="1"' % k),
+        b=pic(c + "b", sizes=SZ, alt=t_ + " 2", extra=' data-i18n-alt="%s" data-n="2"' % k))
+    for k, t_, c in CATS)
 
 MAIN = '''
 <main id="main">
@@ -148,11 +161,11 @@ MAIN = '''
 
 <section id="projects">
   <div class="wrap">
-    <h2 class="rv" data-i18n="gal.h2">פרויקטים נבחרים.</h2>
-    <p class="lead rv" data-i18n="gal.lead">תמונות להמחשה. תמונות מהפרויקטים שלנו יעלו בקרוב.</p>
-  </div>
-  <div class="strip" tabindex="0" role="region" aria-label="גלריית פרויקטים, גלילה לצדדים" data-i18n-label="gal.label">
+    <h2 class="rv" data-i18n="gal.h2">עבודות שביצענו.</h2>
+    <p class="lead rv" data-i18n="gal.lead">מבחר מתוך פרויקטים שתכננו, ייצרנו והתקנו, לפי תחום.</p>
+    <ul class="cats">
 {gal}
+    </ul>
   </div>
 </section>
 
@@ -185,7 +198,7 @@ DOC = '''
     <h2 data-i18n="st.h2a">מה עשינו</h2>
     <ul data-i18n-html="st.la"><li>האתר נבנה לפי התקן הישראלי ת״י 5568 ברמה AA (מבוסס על WCAG 2.0).</li><li>ניווט מלא במקלדת, עם סימון ברור של המיקום ועם קישור דילוג לתוכן.</li><li>מבנה סמנטי לקוראי מסך, בעברית, באנגלית ובצרפתית.</li><li>תפריט נגישות: הגדלת טקסט, ניגודיות גבוהה, הדגשת קישורים ועצירת אנימציות.</li><li>האתר מכבד את הגדרת המכשיר להפחתת תנועה.</li></ul>
     <h2 data-i18n="st.h2b">מגבלות ידועות</h2>
-    <p data-i18n="st.pb">אנחנו ממשיכים לבדוק ולשפר את האתר. ייתכן שחלק מהתוכן, כמו תמונות של פרויקטים, עדיין בלי תיאור מלא. אם נתקלת בבעיה, נשמח שתספר לנו ונתקן.</p>
+    <p data-i18n="st.pb">אנחנו ממשיכים לבדוק ולשפר את האתר. תמונות העבודות מתוארות לפי תחום בלבד, בלי תיאור מפורט. אם נתקלת בבעיה, נשמח שתספר לנו ונתקן.</p>
     <h2 data-i18n="st.h2c">נגישות השירות</h2>
     <p data-i18n="st.pc">השירות שלנו ניתן בבית הלקוח או באתר הבנייה: המדידה, הייעוץ וההתקנה נעשים אצלך. אפשר לפנות אלינו בטלפון, ב-WhatsApp או במייל.</p>
     <h2 data-i18n="st.h2d">רכז הנגישות</h2>
