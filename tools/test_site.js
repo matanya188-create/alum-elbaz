@@ -122,7 +122,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   // ----- עבודות לפי תחום -----
   for (const lang of ["he", "fr"]) { p = await open("index.html?lang=" + lang, 1440, 900); await scrollAll(p);
-    s = await p.evaluate(() => { const im = [...document.querySelectorAll("img")]; const ci = [...document.querySelectorAll(".cat img")]; return { cats: document.querySelectorAll(".cat").length, pics: ci.length, broken: im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.src), noAlt: ci.filter(i => !i.alt || (document.documentElement.lang !== "he" && /[א-ת]/.test(i.alt))).length, old: im.filter(i => /\/(g[1-4]|u\d+)-/.test(i.src)).length, ratio: ci.map(i => { const r = i.getBoundingClientRect(); return Math.round(r.width / r.height * 100); }).filter(x => x !== 80).length }; });
+    s = await p.evaluate(() => { const im = [...document.querySelectorAll("img:not(#lb-img)")]; const ci = [...document.querySelectorAll(".cat img")]; return { cats: document.querySelectorAll(".cat").length, pics: ci.length, broken: im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.src), noAlt: ci.filter(i => !i.alt || (document.documentElement.lang !== "he" && /[א-ת]/.test(i.alt))).length, old: im.filter(i => /\/(g[1-4]|u\d+)-/.test(i.src)).length, ratio: ci.map(i => { const r = i.getBoundingClientRect(); return Math.round(r.width / r.height * 100); }).filter(x => x !== 80).length }; });
     check("עבודות " + lang + ": 9 תחומים, 18 תמונות, כולן נטענות, עם תיאור בשפת הדף וביחס אחיד", s.cats === 9 && s.pics === 18 && s.broken.length === 0 && s.noAlt === 0 && s.old === 0 && s.ratio === 0, s);
     if (lang === "he") { await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_desk.png") }); await p.screenshot({ path: path.join(SHOTS, "site_full_he.png"), fullPage: true }); }
     await p.browserContext().close(); }
@@ -183,6 +183,52 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   }
   p = await open("index.html?proof=demo", 390, 844, { reduce: true }); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
   check("מכשיר שמבקש פחות תנועה: אין הודעות קופצות", await p.evaluate(() => document.getElementById("proof").hidden));
+  await p.browserContext().close();
+  // ----- תצוגת תמונה מוגדלת -----
+  p = await open("index.html", 1440, 900); await scrollAll(p);
+  await p.evaluate(() => document.querySelectorAll(".zoom")[2].scrollIntoView({ behavior: "instant", block: "center" })); await sleep(300);
+  await p.evaluate(() => document.querySelectorAll(".zoom")[2].focus()); await p.keyboard.press("Enter"); await sleep(700);
+  const lbState = () => p.evaluate(() => { const lb = document.getElementById("lb"), im = document.getElementById("lb-img"), r = im.getBoundingClientRect(); return { open: lb.open, src: im.getAttribute("src"), ok: im.complete && im.naturalWidth > 0, alt: im.alt, cap: document.getElementById("lb-cap").textContent, n: document.getElementById("lb-n").textContent, inside: lb.contains(document.activeElement), lock: document.documentElement.classList.contains("lb-open"), fits: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight + 1 && r.right <= innerWidth + 1 && r.width > 200, op: getComputedStyle(lb).opacity, back: document.activeElement === document.querySelectorAll(".zoom")[2] }; });
+  s = await lbState();
+  check("הגדלה: Enter על תמונה פותח אותה בגדול, עם כיתוב, מונה ומיקוד בתוך החלון", s.open && /c2a-960\.jpg$/.test(s.src) && s.ok && s.alt === "דלתות ומחיצות למשרדים 1" && s.cap === "דלתות ומחיצות למשרדים" && s.n === "3 / 18" && s.inside && s.lock && s.fits && s.op === "1", s);
+  await axe(p, "עם תמונה מוגדלת");
+  await p.screenshot({ path: path.join(SHOTS, "site_lb_desk.png") });
+  await p.keyboard.press("ArrowLeft"); await sleep(500); s = await lbState();
+  check("הגדלה: חץ שמאלה בעברית עובר לתמונה הבאה", s.n === "4 / 18" && /c2b-960\.jpg$/.test(s.src) && s.ok, s);
+  await p.keyboard.press("ArrowRight"); await p.keyboard.press("ArrowRight"); await sleep(500); s = await lbState();
+  check("הגדלה: חץ ימינה חוזר אחורה", s.n === "2 / 18" && s.ok, s);
+  await p.click(".lb-prev"); await sleep(400); s = await lbState();
+  check("הגדלה: כפתור הקודם, ומהראשונה ממשיכים לאחרונה", s.n === "1 / 18", s);
+  await p.click(".lb-prev"); await sleep(400); s = await lbState();
+  check("הגדלה: מעבר מעגלי לתמונה האחרונה", s.n === "18 / 18" && s.ok, s);
+  await p.keyboard.press("Escape"); await sleep(500); s = await lbState();
+  check("הגדלה: Escape סוגר, משחרר את הגלילה ומחזיר את המיקוד לתמונה", !s.open && !s.lock && s.back, s);
+  await p.evaluate(() => document.querySelectorAll(".zoom")[5].click()); await sleep(500);
+  await p.mouse.click(8, 450); await sleep(500); s = await lbState();
+  check("הגדלה: לחיצה על הרקע סוגרת", !s.open, s);
+  await p.evaluate(() => document.querySelectorAll(".zoom")[5].click()); await sleep(400); await p.click(".lb-x"); await sleep(500); s = await lbState();
+  check("הגדלה: כפתור הסגירה סוגר", !s.open && !s.lock, s);
+  s = await p.evaluate(() => document.querySelector(".num").textContent);
+  check("ספירה: המספר מסתיים על 12", s === "12", s);
+  await p.browserContext().close();
+  // טלפון + צרפתית
+  p = await open("index.html?lang=fr", 390, 844); await scrollAll(p);
+  s = await p.evaluate(() => ({ z: document.querySelectorAll(".zoom")[0].getAttribute("aria-label"), nx: document.querySelector(".lb-next").getAttribute("aria-label"), he: [...document.querySelectorAll(".zoom,.lb-b,#lb")].filter(e => /[א-ת]/.test(e.getAttribute("aria-label") || "")).length }));
+  check("הגדלה fr: התוויות בצרפתית", /^Agrandir l'image: Fenêtres/.test(s.z) && s.nx === "Image suivante" && s.he === 0, s);
+  await p.evaluate(() => { const z = document.querySelectorAll(".zoom")[6]; z.scrollIntoView({ behavior: "instant", block: "center" }); z.click(); }); await sleep(700);
+  s = await p.evaluate(() => { const im = document.getElementById("lb-img").getBoundingClientRect(); const bs = [...document.querySelectorAll(".lb-b")].map(b => b.getBoundingClientRect()); return { fits: im.top >= 0 && im.bottom <= innerHeight + 1 && im.left >= 0 && im.right <= innerWidth + 1 && im.width > 250, btn: bs.every(r => r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth), over: document.documentElement.scrollWidth > innerWidth + 1, n: document.getElementById("lb-n").textContent }; });
+  check("הגדלה בטלפון: התמונה והכפתורים בתוך המסך, כפתורים 44 פיקסלים לפחות", s.fits && s.btn && !s.over && s.n === "7 / 18", s);
+  await p.screenshot({ path: path.join(SHOTS, "site_lb_mob.png") });
+  // החלקה באצבע: בכיוון שמאל-לימין (ltr) החלקה שמאלה = הבא
+  await p.evaluate(() => { const lb = document.getElementById("lb"); const ev = (t, x) => { const e = new Event(t, { bubbles: true }); e.touches = t === "touchstart" ? [{ clientX: x }] : []; e.changedTouches = [{ clientX: x }]; lb.dispatchEvent(e); }; ev("touchstart", 300); ev("touchend", 120); }); await sleep(400);
+  s = await p.evaluate(() => document.getElementById("lb-n").textContent);
+  check("הגדלה בטלפון: החלקה שמאלה עוברת לתמונה הבאה", s === "8 / 18", s);
+  await p.browserContext().close();
+  // הפחתת תנועה: אין ספירה ואין הזזה, התמונה עדיין נפתחת
+  p = await open("index.html", 1440, 900, { reduce: true }); await scrollAll(p);
+  await p.evaluate(() => document.querySelectorAll(".zoom")[0].click()); await sleep(400);
+  s = await p.evaluate(() => ({ open: document.getElementById("lb").open, tf: getComputedStyle(document.getElementById("lb")).transform, num: document.querySelector(".num").textContent, h1: getComputedStyle(document.querySelector(".hero h1")).animationName }));
+  check("הפחתת תנועה: התמונה נפתחת בלי הזזה, בלי ספירה ובלי כניסת כותרת", s.open && (s.tf === "none" || s.tf === "matrix(1, 0, 0, 1, 0, 0)") && s.num === "12" && s.h1 === "none", s);
   await p.browserContext().close();
   // ----- לוגו -----
   for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);

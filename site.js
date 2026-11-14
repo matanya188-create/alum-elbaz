@@ -36,6 +36,7 @@
       "end.h2": "Planning a home or a renovation? We would love to see the plans.",
       "end.area": "Service across Israel",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Accessibility statement",
+      "lb.label": "Image viewer", "lb.close": "Close", "lb.prev": "Previous image", "lb.next": "Next image", "lb.open": "Enlarge image",
       "pf.label": "Customer recommendations", "pf.close": "Close recommendations", "wa.label": "Message us on WhatsApp", "acc.open": "Accessibility menu",
       "acc.title": "Accessibility", "acc.fs": "Larger text", "acc.hc": "High contrast", "acc.ul": "Highlight links", "acc.nomo": "Stop animations", "acc.reset": "Reset", "acc.close": "Close",
       "st.title": "Accessibility statement | Alum Elbaz",
@@ -82,6 +83,7 @@
       "end.h2": "Un projet de maison ou de rénovation ? Montrez-nous vos plans.",
       "end.area": "Service dans tout Israël",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Déclaration d'accessibilité",
+      "lb.label": "Visionneuse d'images", "lb.close": "Fermer", "lb.prev": "Image précédente", "lb.next": "Image suivante", "lb.open": "Agrandir l'image",
       "pf.label": "Recommandations de clients", "pf.close": "Fermer les recommandations", "wa.label": "Écrivez-nous sur WhatsApp", "acc.open": "Menu d'accessibilité",
       "acc.title": "Accessibilité", "acc.fs": "Texte plus grand", "acc.hc": "Contraste élevé", "acc.ul": "Souligner les liens", "acc.nomo": "Arrêter les animations", "acc.reset": "Réinitialiser", "acc.close": "Fermer",
       "st.title": "Déclaration d'accessibilité | Alum Elbaz",
@@ -118,6 +120,7 @@
     each("[data-i18n-html]", function (el) { var k = el.getAttribute("data-i18n-html"); el.innerHTML = dict && dict[k] != null ? dict[k] : orig.html.get(el); });
     each("[data-i18n-label]", function (el) { var k = el.getAttribute("data-i18n-label"); el.setAttribute("aria-label", dict && dict[k] != null ? dict[k] : orig.attr.get(el)); });
     each("img[data-i18n-alt]", function (el) { var k = el.getAttribute("data-i18n-alt"); el.alt = (dict && dict[k] != null ? dict[k] : heCat[k]) + " " + el.getAttribute("data-n"); });
+    each(".zoom", function (b) { b.setAttribute("aria-label", (dict && dict["lb.open"] || "הגדלת התמונה") + ": " + b.firstElementChild.alt); });
     var tk = d.getAttribute("data-title-key") || "title";
     document.title = dict && dict[tk] ? dict[tk] : orig.title;
     if (metaDesc) metaDesc.setAttribute("content", dict && dict.desc ? dict.desc : orig.desc);
@@ -126,7 +129,15 @@
     if (save) { try { localStorage.setItem("ae_lang", lang); } catch (e) {} }
     AE.lang = lang;
   }
-  each(".langs button", function (b) { b.addEventListener("click", function () { setLang(b.getAttribute("data-lang"), true); }); });
+  function calm() { return d.classList.contains("nomo") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); }
+  /* החלפת שפה: הדף דוהה לרגע, כדי שהיפוך הכיוון לא ייראה כקפיצה */
+  var langT = 0;
+  each(".langs button", function (b) { b.addEventListener("click", function () {
+    var l = b.getAttribute("data-lang"); clearTimeout(langT);
+    if (calm() || l === AE.lang) { d.classList.remove("lg"); setLang(l, true); return; }
+    d.classList.add("lg");
+    langT = setTimeout(function () { setLang(l, true); d.classList.remove("lg"); }, 130);
+  }); });
   setLang(AE.lang, false);
 
   /* ---- קישורים פנימיים: גוללים לסעיף בלי להשאיר #סעיף בכתובת (אחרת כניסה חוזרת קופצת לשם) ---- */
@@ -235,6 +246,58 @@
       var po = new IntersectionObserver(function (es) { if (!started && es[0].isIntersecting) { started = true; po.disconnect(); timer = setTimeout(show, 1500); } }, { threshold: 0.05 });
       po.observe(sentinel);
     }
+  })();
+
+  /* ---- תצוגת תמונה מוגדלת ---- */
+  (function () {
+    var lb = document.getElementById("lb"), zs = document.querySelectorAll(".zoom");
+    if (!lb || !zs.length || !lb.showModal) return;
+    var im = document.getElementById("lb-img"), cap = document.getElementById("lb-cap"), cnt = document.getElementById("lb-n"), cur = 0, x0 = null;
+    function go(i) {
+      cur = (i + zs.length) % zs.length;
+      var src = zs[cur].firstElementChild, big = src.getAttribute("src").replace(/-\d+\.jpg$/, "-960.jpg");
+      if (im.getAttribute("src") !== big) { im.classList.add("sw"); im.setAttribute("src", big); }
+      im.alt = src.alt; cap.textContent = src.alt.replace(/ \d+$/, ""); cnt.textContent = (cur + 1) + " / " + zs.length;
+    }
+    function step(n) { go(cur + n); }
+    im.addEventListener("load", function () { im.classList.remove("sw"); });
+    im.addEventListener("error", function () { im.classList.remove("sw"); });
+    Array.prototype.forEach.call(zs, function (z, i) { z.addEventListener("click", function () { go(i); d.classList.add("lb-open"); lb.showModal(); }); });
+    lb.addEventListener("close", function () { d.classList.remove("lb-open"); });
+    lb.addEventListener("click", function (e) { if (e.target === lb) lb.close(); });
+    lb.querySelector(".lb-x").addEventListener("click", function () { lb.close(); });
+    lb.querySelector(".lb-prev").addEventListener("click", function () { step(-1); });
+    lb.querySelector(".lb-next").addEventListener("click", function () { step(1); });
+    /* החצים לפי כיוון הקריאה: בעברית "הבא" הוא שמאלה */
+    lb.addEventListener("keydown", function (e) {
+      var fwd = d.dir === "rtl" ? "ArrowLeft" : "ArrowRight", back = d.dir === "rtl" ? "ArrowRight" : "ArrowLeft";
+      if (e.key === fwd) { e.preventDefault(); step(1); } else if (e.key === back) { e.preventDefault(); step(-1); }
+    });
+    lb.addEventListener("touchstart", function (e) { x0 = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+    lb.addEventListener("touchend", function (e) {
+      if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 45) step((dx > 0) === (d.dir === "rtl") ? 1 : -1);
+    }, { passive: true });
+  })();
+
+  /* ---- ספירה של מספר השנים, פעם אחת כשהוא נכנס למסך ---- */
+  (function () {
+    var el = document.querySelector(".num[data-count]");
+    if (!el || !("IntersectionObserver" in window)) return;
+    var to = parseInt(el.getAttribute("data-count"), 10);
+    var o = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return; o.disconnect();
+      if (calm()) return;
+      var t0 = null, D = 900;
+      el.textContent = "0";
+      requestAnimationFrame(function f(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min(1, (ts - t0) / D), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = String(Math.round(to * e));
+        if (p < 1) requestAnimationFrame(f);
+      });
+    }, { threshold: 0.6 });
+    o.observe(el);
   })();
 
   /* ---- כניסה בגלילה ---- */

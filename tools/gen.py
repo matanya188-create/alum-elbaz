@@ -126,11 +126,17 @@ CATS = [("cat.1", "חלונות וויטרינות", "c1"), ("cat.2", "דלתו�
         ("cat.4", "מקלחונים", "c4"), ("cat.5", "גדרות ושערים", "c5"), ("cat.6", "הצללה", "c6"),
         ("cat.7", "חיפוי אלומיניום", "c7"), ("cat.8", "ידיות ופרזול", "c8"), ("cat.9", "רשתות פליסה", "c9")]
 SZ = "(min-width:860px) 16vw, 46vw"
+
+
+def zoom(img, label):
+    return '<button type="button" class="zoom" aria-haspopup="dialog" aria-label="הגדלת התמונה: %s">%s</button>' % (label, img)
+
+
 gal = "\n".join(
     '      <li class="cat rv"><h3 data-i18n="{k}">{t}</h3><div class="pair">{a}{b}</div></li>'.format(
         k=k, t=t_,
-        a=pic(c + "a", sizes=SZ, alt=t_ + " 1", extra=' data-i18n-alt="%s" data-n="1"' % k),
-        b=pic(c + "b", sizes=SZ, alt=t_ + " 2", extra=' data-i18n-alt="%s" data-n="2"' % k))
+        a=zoom(pic(c + "a", sizes=SZ, alt=t_ + " 1", extra=' data-i18n-alt="%s" data-n="1"' % k), t_ + " 1"),
+        b=zoom(pic(c + "b", sizes=SZ, alt=t_ + " 2", extra=' data-i18n-alt="%s" data-n="2"' % k), t_ + " 2"))
     for k, t_, c in CATS)
 
 MAIN = '''
@@ -156,7 +162,7 @@ MAIN = '''
 
 <section class="facts" id="why">
   <div class="wrap cols">
-    <p class="big rv">12<small data-i18n="facts.big">שנות ניסיון באלומיניום</small></p>
+    <p class="big rv"><span class="num" data-count="12">12</span><small data-i18n="facts.big">שנות ניסיון באלומיניום</small></p>
     <ul class="list">
 {facts}
     </ul>
@@ -194,6 +200,14 @@ MAIN = '''
 
 '''
 
+LB = '''<dialog class="lb" id="lb" aria-label="תצוגת תמונה" data-i18n-label="lb.label">
+  <button type="button" class="lb-b lb-x" aria-label="סגירה" data-i18n-label="lb.close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <button type="button" class="lb-b lb-prev" aria-label="התמונה הקודמת" data-i18n-label="lb.prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+  <figure><img id="lb-img" src="assets/c1a-480.jpg" alt="" width="960" height="1200" loading="lazy"><figcaption><span id="lb-cap"></span><span id="lb-n" dir="ltr"></span></figcaption></figure>
+  <button type="button" class="lb-b lb-next" aria-label="התמונה הבאה" data-i18n-label="lb.next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+</dialog>
+'''
+
 PROOF = '''<aside class="proof" id="proof" aria-label="המלצות לקוחות" data-i18n-label="pf.label" hidden>
   <span class="pf-av" aria-hidden="true"></span>
   <div class="pf-tx"><p class="pf-1"></p><p class="pf-2"></p></div>
@@ -223,7 +237,7 @@ DOC = '''
 
 index = (HEAD.format(title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver("boot.js")) + nav(True)
          + MAIN.format(hero=pic("hero", eager=True), wa=WA, tiles=tiles, facts=li(FACTS), gal=gal, steps=li(STEPS), endimg=pic("contact"))
-         + PROOF + TAIL.format(wa=WA, vsite=ver("site.js")))
+         + PROOF + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
        + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
 io.open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8", newline="\n").write(index)
