@@ -165,6 +165,10 @@ footer a{text-decoration:underline;text-underline-offset:4px}
 
 /* עמוד העבודות */
 .works{padding-block:120px 72px}
+/* רקע אווירה לעמוד העבודות: תמונה קבועה ומוחשכת מאחורי התוכן */
+.works::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(rgba(var(--scrim),.8),rgba(var(--scrim),.9)),url(assets/works-bg-m.webp) center/cover no-repeat}
+@media (min-width:700px){.works::before{background-image:linear-gradient(rgba(var(--scrim),.78),rgba(var(--scrim),.9)),url(assets/works-bg.webp)}}
+html.hc .works::before{display:none}
 .works h1{font-size:clamp(1.9rem,6vw,2.8rem);line-height:1.15;font-weight:600}
 .chips{margin-top:26px;display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:44px;padding:0 14px;border:1px solid #4a5159;border-radius:999px;font-size:.93rem;color:#d6dade;transition:transform var(--press) var(--ease),background-color .2s ease,color .2s ease}
@@ -177,6 +181,7 @@ footer a{text-decoration:underline;text-underline-offset:4px}
 .gcat h2{font-size:1.35rem;max-width:none}
 .ggrid{margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .ggrid .zoom{aspect-ratio:1/1}
+.ggrid .vid video{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:var(--r);background:#000}
 .works .back{display:inline-block;margin-top:40px;text-decoration:underline;text-underline-offset:4px}
 @media (min-width:600px){.ggrid{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:860px){.ggrid{grid-template-columns:repeat(4,1fr);gap:10px}}

@@ -10,7 +10,7 @@ HEAD = '''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>{title}</title>
 <meta name="description" content="{desc}">
@@ -127,6 +127,13 @@ CATS = [("windows", "חלונות"), ("vitrines", "ויטרינות"), ("belgian
         ("closures", "סגירות חורף ומרפסות"), ("showers", "מקלחונים"), ("pergolas", "פרגולות"), ("fences", "גדרות ושערים"),
         ("office", "דלתות ומחיצות למשרדים"), ("cladding", "חיפוי אלומיניום"), ("screens", "רשתות פליסה"), ("handles", "ידיות")]
 CATS = [(c, n) for c, n in CATS if GAL.get(c)]
+# סרטונים (בלי קול) שמוצגים בסוף התחום בעמוד העבודות
+VID = json.load(open(os.path.join(ROOT, "tools", "gallery_videos.json")))
+
+
+def gvids(c):
+    return "".join('\n      <li class="vid"><video controls playsinline preload="none" poster="assets/g/{c}-v{n:02d}.webp" width="{w}" height="{h}" aria-label="סרטון" data-i18n-label="g.vid">'
+                   '<source src="assets/g/{c}-v{n:02d}.mp4" type="video/mp4"></video></li>'.format(c=c, **v) for v in VID.get(c, []))
 
 
 def gimg(c, name, it, sizes):
@@ -146,7 +153,7 @@ gal = "\n".join(
 chips = "\n".join('      <button type="button" class="chip" data-cat="{c}" aria-pressed="false"><span data-i18n="g.{c}">{t}</span> <span class="cnt" dir="ltr">{n}</span></button>'.format(c=c, t=t_, n=len(GAL[c])) for c, t_ in CATS)
 gsecs = "\n".join(
     '    <section class="gcat" id="g-{c}" data-g="{c}" aria-labelledby="gh-{c}"><h2 id="gh-{c}" data-i18n="g.{c}">{t}</h2><ul class="ggrid">\n{items}\n    </ul></section>'.format(
-        c=c, t=t_, items="\n".join("      <li>" + gimg(c, t_, it, "(min-width:1200px) 230px, (min-width:860px) 24vw, (min-width:600px) 32vw, 48vw") + "</li>" for it in GAL[c]))
+        c=c, t=t_, items="\n".join("      <li>" + gimg(c, t_, it, "(min-width:1200px) 230px, (min-width:860px) 24vw, (min-width:600px) 32vw, 48vw") + "</li>" for it in GAL[c]) + gvids(c))
     for c, t_ in CATS)
 
 WORKS = '''
