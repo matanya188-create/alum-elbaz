@@ -123,7 +123,7 @@ tiles = "\n".join(
         i=(' data-i="%d"' % i) if i else "", img=pic(n, sizes="(min-width:860px) 60vw, 100vw"), k=k, t=t, p=p)
     for i, (n, k, t, p) in enumerate(SVC))
 GAL = json.load(open(os.path.join(ROOT, "tools", "gallery.json")))
-CATS = [("windows", "חלונות"), ("vitrines", "ויטרינות"), ("belgian", "פרופיל בלגי"), ("doors", "דלתות"), ("shutters", "תריסים"),
+CATS = [("windows", "חלונות"), ("vitrines", "ויטרינות"), ("belgian", "פרופיל"), ("doors", "דלתות"), ("shutters", "תריסים"),
         ("closures", "סגירות חורף ומרפסות"), ("showers", "מקלחונים"), ("pergolas", "פרגולות"), ("fences", "גדרות ושערים"),
         ("office", "דלתות ומחיצות למשרדים"), ("cladding", "חיפוי אלומיניום"), ("screens", "רשתות פליסה"), ("handles", "ידיות")]
 CATS = [(c, n) for c, n in CATS if GAL.get(c)]
@@ -265,7 +265,7 @@ index = (HEAD.format(title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver
          + PROOF + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
        + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
-works = (HEAD.format(title="העבודות שלנו | אלום אלבז", desc="כל תמונות העבודות של אלום אלבז בע״מ לפי תחום: חלונות, ויטרינות, פרופיל בלגי, דלתות, מקלחונים, פרגולות ועוד.", tk=' data-title-key="wk.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
+works = (HEAD.format(title="העבודות שלנו | אלום אלבז", desc="כל תמונות העבודות של אלום אלבז בע״מ לפי תחום: חלונות, ויטרינות, פרופילים, דלתות, מקלחונים, פרגולות ועוד.", tk=' data-title-key="wk.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
          + nav(False) + WORKS.format(chips=chips, gsecs=gsecs) + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 io.open(os.path.join(ROOT, "works.html"), "w", encoding="utf-8", newline="\n").write(works)
 io.open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8", newline="\n").write(index)
