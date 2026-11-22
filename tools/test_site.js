@@ -122,7 +122,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   // ----- עבודות לפי תחום -----
   for (const lang of ["he", "fr"]) { p = await open("index.html?lang=" + lang, 1440, 900); await scrollAll(p);
-    s = await p.evaluate(() => { const im = [...document.querySelectorAll("img:not(#lb-img)")]; const ci = [...document.querySelectorAll(".cat img")]; return { cats: document.querySelectorAll(".cat").length, pics: ci.length, broken: im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.src), noAlt: ci.filter(i => !i.alt || (document.documentElement.lang !== "he" && /[א-ת]/.test(i.alt))).length, old: im.filter(i => /\/(g[1-4]|u\d+)-/.test(i.src)).length, ratio: ci.map(i => { const r = i.getBoundingClientRect(); return Math.round(r.width / r.height * 100); }).filter(x => x !== 80).length }; });
+    s = await p.evaluate(() => { const im = [...document.querySelectorAll("main img, header img, footer img")]; const ci = [...document.querySelectorAll(".cat img")]; return { cats: document.querySelectorAll(".cat").length, pics: ci.length, broken: im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.src), noAlt: ci.filter(i => !i.alt || (document.documentElement.lang !== "he" && /[א-ת]/.test(i.alt))).length, old: im.filter(i => /\/(g[1-4]|u\d+)-/.test(i.src)).length, ratio: ci.map(i => { const r = i.getBoundingClientRect(); return Math.round(r.width / r.height * 100); }).filter(x => x !== 80).length }; });
     check("עבודות " + lang + ": 13 תחומים, 26 תמונות, כולן נטענות, עם תיאור בשפת הדף וביחס אחיד", s.cats === 13 && s.pics === 26 && s.broken.length === 0 && s.noAlt === 0 && s.old === 0 && s.ratio === 0, s);
     if (lang === "he") { await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_desk.png") }); await p.screenshot({ path: path.join(SHOTS, "site_full_he.png"), fullPage: true }); }
     await p.browserContext().close(); }
@@ -260,9 +260,28 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     p = await open("index.html?lang=fr", 1440, 900);
     s = await p.evaluate(() => ({ href: document.querySelector(".more").getAttribute("href"), n: document.querySelectorAll(".more").length, txt: document.querySelector(".more").textContent }));
     check("בית fr: קישור 'כל התמונות' לכל תחום, שומר על השפה ועל התחום", s.href === "works.html?cat=" + cats[0] + "&lang=fr" && s.n === cats.length && /^Toutes les photos: Fenêtres \(\d+\)$/.test(s.txt), s);
-    await p.click(".more"); await sleep(2200);
-    s = await p.evaluate(() => ({ path: location.pathname, lang: document.documentElement.lang, h1: document.querySelector("h1").textContent, y: scrollY }));
-    check("בית fr: הקישור מוביל לעמוד העבודות בצרפתית, מתחילת הדף", /works\.html$/.test(s.path) && s.lang === "fr" && s.h1 === "Nos réalisations" && s.y === 0, s);
+    await p.click("#fsb"); await sleep(700);
+    await p.evaluate(() => document.querySelectorAll(".more")[6].scrollIntoView({ block: "center", behavior: "instant" })); await sleep(300);
+    await p.evaluate(() => document.querySelectorAll(".more")[6].click()); await sleep(700);
+    const vs = () => p.evaluate(() => ({ path: location.pathname, q: location.search, fs: !!document.fullscreenElement, home: !document.getElementById("main").hidden, wv: !document.getElementById("wv").hidden, vis: [...document.querySelectorAll("#wv .gcat:not([hidden])")].map(x => x.dataset.g).join(), h1: document.querySelector("#wv h1").textContent, title: document.title, y: scrollY, lang: document.documentElement.lang }));
+    s = await vs();
+    check("בית fr: 'כל התמונות' מציג את התחום בתוך אותו עמוד, מתחילת הדף, ונשאר במסך מלא", /index\.html$/.test(s.path) && /view=works/.test(s.q) && /cat=showers/.test(s.q) && /lang=fr/.test(s.q) && s.fs && !s.home && s.wv && s.vis === "showers" && s.h1 === "Nos réalisations" && s.title === "Nos réalisations | Alum Elbaz" && s.y === 0 && s.lang === "fr", s);
+    await p.evaluate(() => document.querySelector("#wv .gcat:not([hidden]) .zoom").click()); await sleep(800);
+    s = await p.evaluate(() => ({ fs: !!document.fullscreenElement, open: document.getElementById("lb").open, n: document.getElementById("lb-n").textContent, src: document.getElementById("lb-img").getAttribute("src") }));
+    check("בית fr: הגדלת תמונה מתוך כל העבודות נשארת במסך מלא ומדפדפת בתוך התחום", s.fs && s.open && /^1 \/ \d+$/.test(s.n) && /showers-001\.webp$/.test(s.src), s);
+    await p.click(".lb-x"); await sleep(500);
+    await p.evaluate(() => document.querySelector('#wv .chip[data-cat="pergolas"]').click()); await sleep(300); s = await vs();
+    check("בית fr: החלפת תחום בתוך העמוד שומרת על התצוגה ועל מסך מלא", s.fs && s.wv && s.vis === "pergolas" && /view=works/.test(s.q) && /cat=pergolas/.test(s.q), s);
+    await p.evaluate(() => document.querySelector("#wv .back").click()); await sleep(500); s = await vs();
+    check("בית fr: 'חזרה לעמוד הבית' מחזיר את עמוד הבית בלי לצאת ממסך מלא", s.fs && s.home && !s.wv && !/view=|cat=/.test(s.q) && /lang=fr/.test(s.q) && /^Alum Elbaz/.test(s.title), s);
+    await p.goBack(); await sleep(600); s = await vs();
+    check("בית fr: כפתור 'אחורה' של הדפדפן מחזיר לתצוגת העבודות", s.wv && !s.home && s.vis === "pergolas", s);
+    await p.evaluate(() => { const a = [...document.querySelectorAll('.nav .links a')].find(x => x.getAttribute("href") === "#contact"); a.click(); }); await sleep(900); s = await vs();
+    check("בית fr: קישור בתפריט מתוך תצוגת העבודות חוזר לעמוד הבית", s.home && !s.wv, s);
+    await p.browserContext().close();
+    p = await open("index.html?view=works&cat=doors", 390, 844); s = await p.evaluate(() => ({ home: !document.getElementById("main").hidden, vis: [...document.querySelectorAll("#wv .gcat:not([hidden])")].map(x => x.dataset.g).join(), title: document.title, over: document.documentElement.scrollWidth > innerWidth + 1 }));
+    check("בית: כניסה ישירה לקישור של תצוגת העבודות פותחת את התחום הנכון", !s.home && s.vis === "doors" && s.title === "העבודות שלנו | אלום אלבז" && !s.over, s);
+    await axe(p, "עמוד הבית בתצוגת העבודות");
     await p.browserContext().close(); }
   // ----- מסך מלא + אינסטגרם -----
   for (const [w, h, lang] of [[1440, 900, "he"], [390, 844, "fr"], [820, 1180, "en"]]) {

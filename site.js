@@ -152,6 +152,7 @@
     a.addEventListener("click", function (e) {
       var el = document.getElementById(a.getAttribute("href").slice(1)); if (!el) return;
       e.preventDefault();
+      if (wv && !wv.hidden) setView(false, null, true);
       var calm = d.classList.contains("nomo") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
       el.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "start" });
       if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
@@ -269,10 +270,46 @@
     fsb.addEventListener("click", function () {
       try {
         if (fsNow()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-        else { var r = (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl); if (r && r.catch) r.catch(function () {}); }
+        else {
+          var r = (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl); if (r && r.catch) r.catch(function () {});
+          if (navigator.keyboard && navigator.keyboard.lock) navigator.keyboard.lock(["Escape"]).catch(function () {});
+        }
       } catch (e) {}
     });
     document.addEventListener("fullscreenchange", syncFs); document.addEventListener("webkitfullscreenchange", syncFs);
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape" || !fsNow()) return;
+      var lb = document.getElementById("lb"), ap = document.getElementById("acc-panel");
+      if ((lb && lb.open) || (ap && !ap.hidden)) return;
+      try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (er) {}
+    });
+  }
+
+  /* ---- כל העבודות בתוך עמוד הבית: החלפת תצוגה בלי טעינת עמוד (מעבר עמוד היה מוציא ממסך מלא) ---- */
+  var wv = document.getElementById("wv"), homeMain = document.getElementById("main"), homeTitle = orig.title, showCat = null;
+  function setView(works, cat, push) {
+    if (!wv) return;
+    wv.hidden = !works; homeMain.hidden = works;
+    if (works) { d.setAttribute("data-title-key", "wk.title"); orig.title = "העבודות שלנו | אלום אלבז"; if (showCat) showCat(cat, false); }
+    else { d.removeAttribute("data-title-key"); orig.title = homeTitle; }
+    var dict = T[AE.lang], tk = works ? "wk.title" : "title";
+    document.title = dict && dict[tk] ? dict[tk] : orig.title;
+    if (push) { try {
+      var q = new URLSearchParams(location.search);
+      if (works) { q.set("view", "works"); if (cat) q.set("cat", cat); else q.delete("cat"); } else { q.delete("view"); q.delete("cat"); }
+      var s = q.toString(); history.pushState(null, "", location.pathname + (s ? "?" + s : ""));
+    } catch (e) {} }
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    if (works) wv.focus({ preventScroll: true });
+  }
+  function viewFromUrl() { try { var q = new URLSearchParams(location.search); setView(q.get("view") === "works", q.get("cat"), false); } catch (e) {} }
+  if (wv) {
+    each("a.more", function (a) { a.addEventListener("click", function (e) {
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+      e.preventDefault(); var m = /[?&]cat=([a-z]+)/.exec(a.getAttribute("href")); setView(true, m ? m[1] : null, true);
+    }); });
+    each("#wv .back", function (a) { a.addEventListener("click", function (e) { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return; e.preventDefault(); setView(false, null, true); }); });
+    window.addEventListener("popstate", viewFromUrl);
   }
 
   /* ---- עמוד העבודות: תחום אחד מוצג בכל פעם ---- */
@@ -287,9 +324,11 @@
       if (push) { try { var q = new URLSearchParams(location.search); q.set("cat", c); history.replaceState(null, "", location.pathname + "?" + q.toString()); } catch (e) {} }
     }
     var first = null; try { first = new URLSearchParams(location.search).get("cat"); } catch (e) {}
-    show(first, false);
+    show(first, false); showCat = show;
     Array.prototype.forEach.call(chips, function (b) { b.addEventListener("click", function () { show(b.getAttribute("data-cat"), true); }); });
   })();
+
+  if (wv) { try { if (new URLSearchParams(location.search).get("view") === "works") viewFromUrl(); } catch (e) {} }
 
   /* ---- תצוגת תמונה מוגדלת ---- */
   (function () {

@@ -207,7 +207,7 @@ MAIN = '''
   <div class="wrap">
     <h2 class="rv" data-i18n="gal.h2">עבודות שביצענו.</h2>
     <p class="lead rv" data-i18n="gal.lead">מבחר מתוך פרויקטים שתכננו, ייצרנו והתקנו, לפי תחום.</p>
-    <ul class="cats">
+    <ul class="cats" data-g="home">
 {gal}
     </ul>
   </div>
@@ -271,6 +271,8 @@ DOC = '''
 
 index = (HEAD.format(title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver("boot.js")) + nav(True)
          + MAIN.format(hero=pic("hero", eager=True), wa=WA, tiles=tiles, facts=li(FACTS), gal=gal, steps=li(STEPS), endimg=pic("contact"))
+         # אותה גלריה מוטמעת גם בעמוד הבית (מוסתרת), כך שהקישורים "לכל התמונות" מחליפים תצוגה בלי לטעון עמוד
+         + WORKS.format(chips=chips, gsecs=gsecs).replace('<main id="main" class="works">', '<section id="wv" class="works" tabindex="-1" hidden>').replace("</main>", "</section>")
          + PROOF + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
        + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
