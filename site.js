@@ -35,10 +35,10 @@
       "proc.3t": "Manufacturing", "proc.3p": "Made precisely to measure, with quality control before it leaves.",
       "proc.4t": "Installation and support", "proc.4p": "A professional installation team, an orderly handover and service afterwards.",
       "end.h2": "Planning a home or a renovation? We would love to see the plans.",
-      "end.area": "Service across Israel",
+      "end.ig": "Visit us on Instagram too:",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Accessibility statement",
       "lb.label": "Image viewer", "lb.close": "Close", "lb.prev": "Previous image", "lb.next": "Next image", "lb.open": "Enlarge image",
-      "pf.label": "Customer recommendations", "pf.close": "Close recommendations", "wa.label": "Message us on WhatsApp", "acc.open": "Accessibility menu",
+      "pf.label": "Customer recommendations", "pf.close": "Close recommendations", "fs.on": "Full screen", "fs.off": "Exit full screen", "wa.label": "Message us on WhatsApp", "ig.label": "Our Instagram page", "acc.open": "Accessibility menu",
       "acc.title": "Accessibility", "acc.fs": "Larger text", "acc.hc": "High contrast", "acc.ul": "Highlight links", "acc.nomo": "Stop animations", "acc.reset": "Reset", "acc.close": "Close",
       "st.title": "Accessibility statement | Alum Elbaz",
       "st.h1": "Accessibility statement",
@@ -83,10 +83,10 @@
       "proc.3t": "Fabrication", "proc.3p": "Une fabrication précise sur mesure, avec contrôle qualité avant le départ.",
       "proc.4t": "Pose et suivi", "proc.4p": "Une équipe de pose professionnelle, une livraison soignée et un service après.",
       "end.h2": "Un projet de maison ou de rénovation ? Montrez-nous vos plans.",
-      "end.area": "Service dans tout Israël",
+      "end.ig": "Retrouvez-nous aussi sur Instagram :",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Déclaration d'accessibilité",
       "lb.label": "Visionneuse d'images", "lb.close": "Fermer", "lb.prev": "Image précédente", "lb.next": "Image suivante", "lb.open": "Agrandir l'image",
-      "pf.label": "Recommandations de clients", "pf.close": "Fermer les recommandations", "wa.label": "Écrivez-nous sur WhatsApp", "acc.open": "Menu d'accessibilité",
+      "pf.label": "Recommandations de clients", "pf.close": "Fermer les recommandations", "fs.on": "Plein écran", "fs.off": "Quitter le plein écran", "wa.label": "Écrivez-nous sur WhatsApp", "ig.label": "Notre page Instagram", "acc.open": "Menu d'accessibilité",
       "acc.title": "Accessibilité", "acc.fs": "Texte plus grand", "acc.hc": "Contraste élevé", "acc.ul": "Souligner les liens", "acc.nomo": "Arrêter les animations", "acc.reset": "Réinitialiser", "acc.close": "Fermer",
       "st.title": "Déclaration d'accessibilité | Alum Elbaz",
       "st.h1": "Déclaration d'accessibilité",
@@ -134,6 +134,7 @@
     });
     if (save) { try { localStorage.setItem("ae_lang", lang); } catch (e) {} }
     AE.lang = lang;
+    syncFs();
   }
   function calm() { return d.classList.contains("nomo") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); }
   /* החלפת שפה: הדף דוהה לרגע, כדי שהיפוך הכיוון לא ייראה כקפיצה */
@@ -253,6 +254,26 @@
       po.observe(sentinel);
     }
   })();
+
+  /* ---- מסך מלא ---- */
+  var fsb = document.getElementById("fsb"), fsEl = document.documentElement;
+  function fsNow() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function syncFs() {
+    if (!fsb) return;
+    var on = !!fsNow(), dict = T[AE.lang], k = on ? "fs.off" : "fs.on";
+    fsb.setAttribute("aria-pressed", String(on));
+    document.getElementById("fsb-t").textContent = dict && dict[k] ? dict[k] : (on ? "יציאה ממסך מלא" : "מסך מלא");
+  }
+  if (fsb && (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen) && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+    fsb.hidden = false; syncFs();
+    fsb.addEventListener("click", function () {
+      try {
+        if (fsNow()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        else { var r = (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl); if (r && r.catch) r.catch(function () {}); }
+      } catch (e) {}
+    });
+    document.addEventListener("fullscreenchange", syncFs); document.addEventListener("webkitfullscreenchange", syncFs);
+  }
 
   /* ---- עמוד העבודות: תחום אחד מוצג בכל פעם ---- */
   (function () {

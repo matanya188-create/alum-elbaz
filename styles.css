@@ -53,7 +53,7 @@ main [tabindex="-1"]:focus,main[tabindex="-1"]:focus{outline:0}
 .hero{position:relative;min-height:100dvh;display:flex;align-items:flex-end;overflow:hidden}
 .ph{position:absolute;inset:0}
 .hero .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--scrim),1) 10%,rgba(var(--scrim),.88) 40%,rgba(var(--scrim),.2) 78%,rgba(var(--scrim),.5) 100%)}
-.hero .in{position:relative;padding-block:96px 104px;width:100%}
+.hero .in{position:relative;padding-block:96px 172px;width:100%}
 .hero h1{font-size:clamp(2.2rem,8.6vw,4.4rem);line-height:1.08;font-weight:600;letter-spacing:-.01em;max-width:13ch}
 [dir="ltr"] .hero h1{max-width:17ch;font-size:clamp(2rem,7.4vw,4rem)}
 .hero h1 em{font-style:normal;font-weight:300}
@@ -127,6 +127,8 @@ html.lb-open{overflow:hidden}
 .end .ph::after{content:"";position:absolute;inset:0;background:rgba(var(--scrim),.9)}
 .end .in{position:relative}
 .end address{font-style:normal;margin-top:22px;color:var(--muted);display:grid;gap:4px}
+.end address .ig{margin-top:10px}
+.end address .qr{width:150px;height:auto;object-fit:contain;margin-top:10px;border-radius:8px;background:#fff}
 .end address a{justify-self:start;color:var(--text);text-decoration:underline;text-underline-offset:4px}
 footer{border-top:1px solid var(--line);padding-block:28px 96px;color:var(--muted);font-size:.9rem}
 footer .brand{justify-content:center;padding-block:28px 36px}
@@ -134,9 +136,20 @@ footer .brand img{width:min(230px,60vw);height:auto;object-fit:contain}
 footer .wrap{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:space-between}
 footer a{text-decoration:underline;text-underline-offset:4px}
 
+/* מסך מלא: נעוץ בצד שמאל למעלה, מתחת לסרגל הניווט. מוצג רק בדפדפן שתומך */
+.fsb{position:fixed;left:16px;top:88px;z-index:9;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;background:rgba(29,33,37,.88);border:1px solid #4a5159;color:var(--text);font-size:.85rem;box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform var(--press) var(--ease)}
+.fsb[hidden]{display:none}
+.fsb:active{transform:scale(.97)}
+.fsb svg{width:18px;height:18px;flex:none}
+.fsb .i-off,.fsb[aria-pressed="true"] .i-on{display:none}
+.fsb[aria-pressed="true"] .i-off{display:block}
+html:has(.mnav.open) .fsb,html.lb-open .fsb{display:none}
+
 /* כפתורים צפים */
 .fab{position:fixed;bottom:18px;z-index:9;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .fab.wa{inset-inline-start:16px;background:#12803f;color:#fff}
+/* אינסטגרם: מעל כפתור ה-WhatsApp, בצבעי המותג */
+.fab.ig{inset-inline-start:16px;bottom:86px;color:#fff;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285aeb 90%)}
 .fab.acc{inset-inline-end:16px;background:var(--text);color:var(--bg)}
 .fab svg{width:28px;height:28px}
 
@@ -237,6 +250,7 @@ html.nomo .rv{opacity:1!important;transform:none!important}
 
 /* מצבי נגישות */
 html.hc{--bg:#000;--bg2:#000;--line:#fff;--text:#fff;--muted:#fff;--scrim:0,0,0}
+html.hc .fsb{background:#000;border-color:#fff}
 html.hc .chip,html.hc .more,html.hc .hero p,html.hc .tile p,html.hc .nav .links,html.hc .langs button,html.hc .doc p,html.hc .doc li{color:#fff}
 html.hc .hero .ph::after{background:rgba(0,0,0,.82)}
 html.hc .end .ph::after{background:rgba(0,0,0,.94)}

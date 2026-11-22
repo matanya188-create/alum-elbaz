@@ -264,6 +264,25 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     s = await p.evaluate(() => ({ path: location.pathname, lang: document.documentElement.lang, h1: document.querySelector("h1").textContent, y: scrollY }));
     check("בית fr: הקישור מוביל לעמוד העבודות בצרפתית, מתחילת הדף", /works\.html$/.test(s.path) && s.lang === "fr" && s.h1 === "Nos réalisations" && s.y === 0, s);
     await p.browserContext().close(); }
+  // ----- מסך מלא + אינסטגרם -----
+  for (const [w, h, lang] of [[1440, 900, "he"], [390, 844, "fr"], [820, 1180, "en"]]) {
+    p = await open("index.html" + (lang === "he" ? "" : "?lang=" + lang), w, h);
+    s = await p.evaluate(() => { const b = document.getElementById("fsb"), r = b.getBoundingClientRect(), ig = document.querySelector(".fab.ig").getBoundingClientRect(), wa = document.querySelector(".fab.wa").getBoundingClientRect(); const hit = (a, c) => !(a.right <= c.left || a.left >= c.right || a.bottom <= c.top || a.top >= c.bottom); const others = [...document.querySelectorAll(".nav a,.nav button,.hero .btn,.hero h1,.hero p")].filter(e => e.getClientRects().length).map(e => e.getBoundingClientRect()); return { shown: !b.hidden && r.width > 0, left: r.left, top: r.top, h: r.height, txt: b.textContent.trim(), pressed: b.getAttribute("aria-pressed"), cover: others.some(o => hit(r, o) || hit(ig, o)), igAbove: ig.bottom <= wa.top && Math.abs(ig.left - wa.left) < 1, igHref: document.querySelector(".fab.ig").href, igLabel: document.querySelector(".fab.ig").getAttribute("aria-label") }; });
+    check("מסך מלא " + lang + " " + w + ": הכפתור מוצג בשמאל למעלה ולא מכסה דבר; אינסטגרם מעל WhatsApp", s.shown && s.left === 16 && s.top === 88 && s.h >= 44 && s.txt === { he: "מסך מלא", fr: "Plein écran", en: "Full screen" }[lang] && s.pressed === "false" && !s.cover && s.igAbove && s.igHref === "https://www.instagram.com/alumelbazltd" && !(lang !== "he" && /[א-ת]/.test(s.igLabel)), s);
+    await p.evaluate(() => scrollTo({ top: 1500, behavior: "instant" })); await sleep(300);
+    s = await p.evaluate(() => { const r = document.getElementById("fsb").getBoundingClientRect(), ig = document.querySelector(".fab.ig").getBoundingClientRect(); return { top: r.top, left: r.left, igIn: ig.bottom <= innerHeight && ig.top > 0 }; });
+    check("מסך מלא " + lang + ": הכפתור וכפתור האינסטגרם נשארים במקום בגלילה", s.top === 88 && s.left === 16 && s.igIn, s);
+    await p.click("#fsb"); await sleep(900);
+    s = await p.evaluate(() => ({ fs: !!document.fullscreenElement, txt: document.getElementById("fsb").textContent.trim(), pressed: document.getElementById("fsb").getAttribute("aria-pressed") }));
+    check("מסך מלא " + lang + ": לחיצה נכנסת למסך מלא והכפתור מתחלף ליציאה", s.fs && s.pressed === "true" && s.txt === { he: "יציאה ממסך מלא", fr: "Quitter le plein écran", en: "Exit full screen" }[lang], s);
+    if (lang === "he") { await p.click('.langs [data-lang="en"]'); await sleep(400); s = await p.evaluate(() => document.getElementById("fsb").textContent.trim()); check("מסך מלא: החלפת שפה בזמן מסך מלא שומרת על הכיתוב הנכון", s === "Exit full screen", s); }
+    await p.click("#fsb"); await sleep(900);
+    s = await p.evaluate(() => ({ fs: !!document.fullscreenElement, pressed: document.getElementById("fsb").getAttribute("aria-pressed") }));
+    check("מסך מלא " + lang + ": לחיצה שנייה יוצאת ממסך מלא", !s.fs && s.pressed === "false", s);
+    await p.browserContext().close(); }
+  p = await open("index.html", 390, 844); await p.click(".menu-btn"); await sleep(300);
+  s = await p.evaluate(() => getComputedStyle(document.getElementById("fsb")).display);
+  check("מסך מלא: הכפתור מוסתר כשתפריט הטלפון פתוח", s === "none", s); await p.browserContext().close();
   // ----- לוגו -----
   for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);
     s = await p.evaluate(() => { const m = document.querySelector(".logo img"), f = document.querySelector("footer .brand img"), r = m.getBoundingClientRect(); return { mark: m.complete && m.naturalWidth > 0, h: Math.round(r.height), inNav: r.top >= 0 && r.bottom <= 80, full: f.complete && f.naturalWidth > 0, fw: Math.round(f.getBoundingClientRect().width), name: document.querySelector(".logo").textContent.trim() }; });
@@ -273,7 +292,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // ----- קישורים ואבטחה -----
   p = await open("index.html", 1440, 900);
   s = await p.evaluate(() => ({ ext: [...document.querySelectorAll('a[target="_blank"]')].map(a => a.rel + " " + a.href), wa: [...document.querySelectorAll('a[href^="https://wa.me/"]')].length, tel: document.querySelector('a[href^="tel:"]').getAttribute("href"), inlineScripts: [...document.scripts].filter(x => !x.src).length, inlineStyle: document.querySelectorAll("[style]").length, forms: document.forms.length, extRes: performance.getEntriesByType("resource").map(r => r.name).filter(n => !n.startsWith(location.origin)), csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]').content }));
-  check("קישורי WhatsApp וטלפון נכונים, וכל קישור חיצוני עם noopener", s.wa >= 3 && s.tel === "tel:+972543547192" && s.ext.every(x => /noopener/.test(x) && /wa\.me\/972543547192/.test(x)), s.ext);
+  check("קישורי WhatsApp וטלפון נכונים, וכל קישור חיצוני עם noopener", s.wa >= 3 && s.tel === "tel:+972543547192" && s.ext.every(x => /noopener/.test(x) && /wa\.me\/972543547192|www\.instagram\.com\/alumelbazltd$/.test(x)) && s.ext.filter(x => /instagram/.test(x)).length === 2, s.ext);
   check("אין סקריפט או עיצוב בתוך הדף, אין טפסים, ואין שום משאב מאתר חיצוני", s.inlineScripts === 0 && s.inlineStyle === 0 && s.forms === 0 && s.extRes.length === 0, s);
   const inj = await p.evaluate(async () => { let blocked = 0; document.addEventListener("securitypolicyviolation", () => blocked++); const sc = document.createElement("script"); sc.textContent = "window.__x=1"; document.head.appendChild(sc); const im = new Image(); im.src = "https://example.com/x.png"; document.body.appendChild(im); await new Promise(r => setTimeout(r, 500)); return { ran: !!window.__x, blocked }; });
   check("CSP חוסם סקריפט מוזרק ותמונה מאתר זר", !inj.ran && inj.blocked >= 2, inj);
