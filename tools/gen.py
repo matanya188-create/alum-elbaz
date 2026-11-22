@@ -127,7 +127,7 @@ CATS = [("windows", "חלונות"), ("vitrines", "ויטרינות"), ("belgian
         ("closures", "סגירות חורף ומרפסות"), ("showers", "מקלחונים"), ("pergolas", "פרגולות"), ("fences", "גדרות ושערים"),
         ("office", "דלתות ומחיצות למשרדים"), ("cladding", "חיפוי אלומיניום"), ("screens", "רשתות פליסה"), ("handles", "ידיות")]
 CATS = [(c, n) for c, n in CATS if GAL.get(c)]
-# סרטונים (בלי קול) שמוצגים בסוף התחום בעמוד העבודות
+# סרטונים שמוצגים בסוף התחום בעמוד העבודות. v01 בלי קול; v02 עם קול, אחרי חיתוך הפנייה בשם ללקוח בתחילתו (1.22 שניות)
 VID = json.load(open(os.path.join(ROOT, "tools", "gallery_videos.json")))
 
 
