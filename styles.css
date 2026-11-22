@@ -181,7 +181,10 @@ html.hc .works::before{display:none}
 .gcat h2{font-size:1.35rem;max-width:none}
 .ggrid{margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .ggrid .zoom{aspect-ratio:1/1}
-.ggrid .vid video{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:var(--r);background:#000}
+/* סרטון: אריח גבוה (שתי שורות) שמציג את כל התמונה בלי חיתוך; במסך מלא הסרטון ממלא את המסך ביחס המקורי */
+.ggrid .vid{grid-row:span 2}
+.ggrid .vid video{display:block;width:100%;height:100%;object-fit:contain;border-radius:var(--r);background:#000}
+.ggrid .vid video:fullscreen{border-radius:0}
 .works .back{display:inline-block;margin-top:40px;text-decoration:underline;text-underline-offset:4px}
 @media (min-width:600px){.ggrid{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:860px){.ggrid{grid-template-columns:repeat(4,1fr);gap:10px}}
