@@ -18,7 +18,7 @@ HEAD = '''<!DOCTYPE html>
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
-<meta property="og:image" content="assets/hero-2048.jpg">
+<meta property="og:image" content="assets/hero-1920.jpg">
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="favicon.png">
 <link rel="preload" href="fonts/plex-hebrew-600.woff2" as="font" type="font/woff2" crossorigin>
@@ -93,10 +93,10 @@ MAN = json.load(open(os.path.join(ROOT, "tools", "photos.json")))
 
 
 def pic(n, eager=False, sizes="100vw", alt="", extra=""):
-    m = MAN[n]; big, small = m["s"]
+    m = MAN[n]; ss = sorted(m["s"])
     tail = ' fetchpriority="high"' if eager else ' loading="lazy" decoding="async"'
-    return ('<img src="assets/{n}-{sm}.jpg" srcset="assets/{n}-{sm}.jpg {sm}w, assets/{n}-{bg}.jpg {bg}w" '
-            'sizes="{s}" width="{w}" height="{h}" alt="{alt}"{x}{t}>').format(n=n, sm=small, bg=big, s=sizes, w=m["w"], h=m["h"], alt=alt, x=extra, t=tail)
+    return ('<img src="assets/{n}-{sm}.jpg" srcset="{set}" '
+            'sizes="{s}" width="{w}" height="{h}" alt="{alt}"{x}{t}>').format(n=n, sm=ss[0], set=", ".join("assets/%s-%d.jpg %dw" % (n, v, v) for v in ss), s=sizes, w=m["w"], h=m["h"], alt=alt, x=extra, t=tail)
 
 
 def li(items, cls="rv"):

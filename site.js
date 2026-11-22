@@ -250,9 +250,12 @@
     box.addEventListener("mouseleave", function () { if (box.classList.contains("on") && !off) { clearTimeout(timer); timer = setTimeout(function () { hide(true); }, 2500); } });
     /* ההודעה הראשונה רק אחרי שהגולש התחיל לגלול */
     var sentinel = document.getElementById("services");
-    if (sentinel && "IntersectionObserver" in window) {
-      var po = new IntersectionObserver(function (es) { if (!started && es[0].isIntersecting) { started = true; po.disconnect(); timer = setTimeout(show, 1500); } }, { threshold: 0.05 });
-      po.observe(sentinel);
+    if (sentinel) {
+      var onScroll = function () {
+        if (started || (window.pageYOffset || d.scrollTop) < 160) return;
+        started = true; window.removeEventListener("scroll", onScroll); timer = setTimeout(show, 1500);
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
     }
   })();
 
@@ -345,8 +348,15 @@
     im.addEventListener("load", function () { im.classList.remove("sw"); });
     im.addEventListener("error", function () { im.classList.remove("sw"); });
     Array.prototype.forEach.call(all, function (z) { z.addEventListener("click", function () {
-      var g = z.closest("[data-g]"); zs = g ? g.querySelectorAll(".zoom") : all;
-      go(Array.prototype.indexOf.call(zs, z)); d.classList.add("lb-open"); lb.showModal();
+      var g = z.closest("[data-g]"), i = -1; zs = g ? g.querySelectorAll(".zoom") : all;
+      /* תמונה מעמוד הבית: מדפדפים בכל התמונות של אותו תחום, לא בין התחומים */
+      if (g && g.getAttribute("data-g") === "home") {
+        var key = (z.firstElementChild.getAttribute("data-i18n-alt") || "").replace("g.", ""), full = z.firstElementChild.getAttribute("data-full");
+        var sec = key ? document.getElementById("g-" + key) : null, cat = z.closest(".cat");
+        zs = sec ? sec.querySelectorAll(".zoom") : (cat ? cat.querySelectorAll(".zoom") : zs);
+        Array.prototype.forEach.call(zs, function (o, k) { if (i < 0 && o.firstElementChild.getAttribute("data-full") === full) i = k; });
+      }
+      go(i >= 0 ? i : Array.prototype.indexOf.call(zs, z)); d.classList.add("lb-open"); lb.showModal();
     }); });
     lb.addEventListener("close", function () { d.classList.remove("lb-open"); });
     lb.addEventListener("click", function (e) { if (e.target === lb) lb.close(); });

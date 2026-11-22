@@ -280,6 +280,15 @@ html.ul a{text-decoration:underline!important;text-underline-offset:4px;outline:
   footer{padding-block:28px}
   .hero .in{padding-bottom:40px}
 }
+/* מסך צר או מסך לאורך (טלפון, טאבלט): כל תמונת הפתיחה נראית, כולל הרכב, והטקסט מתחתיה */
+@media (max-width:859px),(max-aspect-ratio:1/1){
+  .hero{display:block;min-height:0;padding-top:80px}
+  .hero .ph{position:relative;inset:auto;aspect-ratio:16/9;max-height:62dvh;overflow:hidden}
+  .hero .ph::after,[dir="ltr"] .hero .ph::after{background:linear-gradient(to top,rgba(var(--scrim),1) 0%,rgba(var(--scrim),0) 22%)}
+  html[dir="ltr"] .hero .ph img{transform:none;animation-name:heroZoom}
+  .hero .in{padding-block:22px 56px}
+  .nav{background:var(--bg)}
+}
 @supports (animation-timeline:scroll()){
   @media (prefers-reduced-motion:no-preference) and (min-width:860px){
     [dir="ltr"] .hero .ph img{animation-name:heroZoomLtr}
