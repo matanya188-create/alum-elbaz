@@ -88,6 +88,8 @@ h2{font-size:clamp(1.7rem,5.4vw,2.7rem);line-height:1.15;font-weight:600;letter-
 .cats{margin-top:36px;display:grid;gap:34px 20px;grid-template-columns:1fr}
 .cat h3{font-size:1.1rem;font-weight:600;padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--line)}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.more{display:inline-block;margin-top:10px;font-size:.92rem;color:var(--muted);text-decoration:underline;text-underline-offset:4px}
+.more:hover{color:var(--text)}
 .zoom{display:block;width:100%;padding:0;aspect-ratio:4/5;overflow:hidden;border-radius:var(--r);background:var(--bg2);cursor:zoom-in}
 .zoom img{transition:transform .9s var(--ease)}
 .zoom:active img{transform:scale(.98);transition-duration:var(--press)}
@@ -161,6 +163,25 @@ footer a{text-decoration:underline;text-underline-offset:4px}
 .acc-panel :focus-visible{outline-color:#0b57d0}
 .acc-panel .st{text-decoration:underline}
 
+/* עמוד העבודות */
+.works{padding-block:120px 72px}
+.works h1{font-size:clamp(1.9rem,6vw,2.8rem);line-height:1.15;font-weight:600}
+.chips{margin-top:26px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border:1px solid #4a5159;border-radius:999px;font-size:.93rem;color:#d6dade;transition:transform var(--press) var(--ease),background-color .2s ease,color .2s ease}
+.chip:active{transform:scale(.97)}
+.chip .cnt{color:var(--muted);font-size:.8rem;margin-inline-start:4px}
+.chip[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chip[aria-pressed="true"] .cnt{color:#3a4046}
+.gcat{padding-block:34px 0}
+.gcat[hidden]{display:none}
+.gcat h2{font-size:1.35rem;max-width:none}
+.ggrid{margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.ggrid .zoom{aspect-ratio:1/1}
+.works .back{display:inline-block;margin-top:40px;text-decoration:underline;text-underline-offset:4px}
+@media (min-width:600px){.ggrid{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:860px){.ggrid{grid-template-columns:repeat(4,1fr);gap:10px}}
+@media (min-width:1200px){.ggrid{grid-template-columns:repeat(5,1fr)}}
+
 /* עמוד הצהרת הנגישות */
 .doc{padding-block:120px 72px}
 .doc h1{font-size:clamp(1.9rem,6vw,2.8rem);line-height:1.15;font-weight:600}
@@ -208,7 +229,7 @@ html.nomo .rv{opacity:1!important;transform:none!important}
 
 /* מצבי נגישות */
 html.hc{--bg:#000;--bg2:#000;--line:#fff;--text:#fff;--muted:#fff;--scrim:0,0,0}
-html.hc .hero p,html.hc .tile p,html.hc .nav .links,html.hc .langs button,html.hc .doc p,html.hc .doc li{color:#fff}
+html.hc .chip,html.hc .more,html.hc .hero p,html.hc .tile p,html.hc .nav .links,html.hc .langs button,html.hc .doc p,html.hc .doc li{color:#fff}
 html.hc .hero .ph::after{background:rgba(0,0,0,.82)}
 html.hc .end .ph::after{background:rgba(0,0,0,.94)}
 html.hc .tile::after{background:linear-gradient(to top,#000 35%,rgba(0,0,0,.2))}

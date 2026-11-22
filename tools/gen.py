@@ -122,22 +122,47 @@ tiles = "\n".join(
     '      <li class="tile rv"{i}>{img}<div><h3 data-i18n="{k}t">{t}</h3><p data-i18n="{k}p">{p}</p></div></li>'.format(
         i=(' data-i="%d"' % i) if i else "", img=pic(n, sizes="(min-width:860px) 60vw, 100vw"), k=k, t=t, p=p)
     for i, (n, k, t, p) in enumerate(SVC))
-CATS = [("cat.1", "חלונות וויטרינות", "c1"), ("cat.2", "דלתות ומחיצות למשרדים", "c2"), ("cat.3", "פרגולות", "c3"),
-        ("cat.4", "מקלחונים", "c4"), ("cat.5", "גדרות ושערים", "c5"), ("cat.6", "הצללה", "c6"),
-        ("cat.7", "חיפוי אלומיניום", "c7"), ("cat.8", "ידיות ופרזול", "c8"), ("cat.9", "רשתות פליסה", "c9")]
-SZ = "(min-width:860px) 16vw, 46vw"
+GAL = json.load(open(os.path.join(ROOT, "tools", "gallery.json")))
+CATS = [("windows", "חלונות"), ("vitrines", "ויטרינות"), ("belgian", "פרופיל בלגי"), ("doors", "דלתות"), ("shutters", "תריסים"),
+        ("closures", "סגירות חורף ומרפסות"), ("showers", "מקלחונים"), ("pergolas", "פרגולות"), ("fences", "גדרות ושערים"),
+        ("office", "דלתות ומחיצות למשרדים"), ("cladding", "חיפוי אלומיניום"), ("screens", "רשתות פליסה"), ("handles", "ידיות")]
+CATS = [(c, n) for c, n in CATS if GAL.get(c)]
 
 
-def zoom(img, label):
-    return '<button type="button" class="zoom" aria-haspopup="dialog" aria-label="הגדלת התמונה: %s">%s</button>' % (label, img)
+def gimg(c, name, it, sizes):
+    f = "assets/g/%s-%03d" % (c, it["n"]); alt = "%s %d" % (name, it["n"])
+    return ('<button type="button" class="zoom" aria-haspopup="dialog" aria-label="הגדלת התמונה: {alt}"><img src="{f}-t.webp" data-full="{f}.webp" '
+            'sizes="{s}" width="{w}" height="{h}" alt="{alt}" data-i18n-alt="g.{c}" data-n="{n}" loading="lazy" decoding="async"></button>'
+            ).format(alt=alt, f=f, s=sizes, w=it["tw"], h=it["th"], c=c, n=it["n"])
 
 
 gal = "\n".join(
-    '      <li class="cat rv"><h3 data-i18n="{k}">{t}</h3><div class="pair">{a}{b}</div></li>'.format(
-        k=k, t=t_,
-        a=zoom(pic(c + "a", sizes=SZ, alt=t_ + " 1", extra=' data-i18n-alt="%s" data-n="1"' % k), t_ + " 1"),
-        b=zoom(pic(c + "b", sizes=SZ, alt=t_ + " 2", extra=' data-i18n-alt="%s" data-n="2"' % k), t_ + " 2"))
-    for k, t_, c in CATS)
+    ('      <li class="cat rv"><h3 data-i18n="g.{c}">{t}</h3><div class="pair">{a}{b}</div>'
+     '<a class="more" href="works.html?cat={c}" data-keep-lang><span data-i18n="g.more">לכל התמונות</span><span class="sr">: </span><span class="sr" data-i18n="g.{c}">{t}</span> <span dir="ltr">({n})</span></a></li>'
+     ).format(c=c, t=t_, n=len(GAL[c]), a=gimg(c, t_, GAL[c][0], "(min-width:860px) 16vw, 46vw"),
+              b=gimg(c, t_, GAL[c][1], "(min-width:860px) 16vw, 46vw") if len(GAL[c]) > 1 else "")
+    for c, t_ in CATS)
+
+chips = "\n".join('      <button type="button" class="chip" data-cat="{c}" aria-pressed="false"><span data-i18n="g.{c}">{t}</span> <span class="cnt" dir="ltr">{n}</span></button>'.format(c=c, t=t_, n=len(GAL[c])) for c, t_ in CATS)
+gsecs = "\n".join(
+    '    <section class="gcat" id="g-{c}" data-g="{c}" aria-labelledby="gh-{c}"><h2 id="gh-{c}" data-i18n="g.{c}">{t}</h2><ul class="ggrid">\n{items}\n    </ul></section>'.format(
+        c=c, t=t_, items="\n".join("      <li>" + gimg(c, t_, it, "(min-width:1200px) 230px, (min-width:860px) 24vw, (min-width:600px) 32vw, 48vw") + "</li>" for it in GAL[c]))
+    for c, t_ in CATS)
+
+WORKS = '''
+<main id="main" class="works">
+  <div class="wrap">
+    <h1 data-i18n="wk.h1">העבודות שלנו</h1>
+    <p class="lead" data-i18n="wk.lead">כל התמונות, לפי תחום. לחיצה על תמונה מגדילה אותה.</p>
+    <div class="chips" role="group" aria-label="תחומים" data-i18n-label="wk.cats">
+{chips}
+    </div>
+{gsecs}
+    <a class="back" href="index.html" data-keep-lang data-i18n="st.back">חזרה לעמוד הבית</a>
+  </div>
+</main>
+
+'''
 
 MAIN = '''
 <main id="main">
@@ -203,7 +228,7 @@ MAIN = '''
 LB = '''<dialog class="lb" id="lb" aria-label="תצוגת תמונה" data-i18n-label="lb.label">
   <button type="button" class="lb-b lb-x" aria-label="סגירה" data-i18n-label="lb.close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <button type="button" class="lb-b lb-prev" aria-label="התמונה הקודמת" data-i18n-label="lb.prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-  <figure><img id="lb-img" src="assets/c1a-480.jpg" alt="" width="960" height="1200" loading="lazy"><figcaption><span id="lb-cap"></span><span id="lb-n" dir="ltr"></span></figcaption></figure>
+  <figure><img id="lb-img" src="assets/g/windows-001-t.webp" alt="" width="960" height="1200" loading="lazy"><figcaption><span id="lb-cap"></span><span id="lb-n" dir="ltr"></span></figcaption></figure>
   <button type="button" class="lb-b lb-next" aria-label="התמונה הבאה" data-i18n-label="lb.next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
 </dialog>
 '''
@@ -240,6 +265,9 @@ index = (HEAD.format(title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver
          + PROOF + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
        + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
+works = (HEAD.format(title="העבודות שלנו | אלום אלבז", desc="כל תמונות העבודות של אלום אלבז בע״מ לפי תחום: חלונות, ויטרינות, פרופיל בלגי, דלתות, מקלחונים, פרגולות ועוד.", tk=' data-title-key="wk.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
+         + nav(False) + WORKS.format(chips=chips, gsecs=gsecs) + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
+io.open(os.path.join(ROOT, "works.html"), "w", encoding="utf-8", newline="\n").write(works)
 io.open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8", newline="\n").write(index)
 io.open(os.path.join(ROOT, "accessibility.html"), "w", encoding="utf-8", newline="\n").write(acc)
 print("ok", len(index), len(acc))

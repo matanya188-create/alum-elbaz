@@ -123,7 +123,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // ----- עבודות לפי תחום -----
   for (const lang of ["he", "fr"]) { p = await open("index.html?lang=" + lang, 1440, 900); await scrollAll(p);
     s = await p.evaluate(() => { const im = [...document.querySelectorAll("img:not(#lb-img)")]; const ci = [...document.querySelectorAll(".cat img")]; return { cats: document.querySelectorAll(".cat").length, pics: ci.length, broken: im.filter(i => !(i.complete && i.naturalWidth > 0)).map(i => i.src), noAlt: ci.filter(i => !i.alt || (document.documentElement.lang !== "he" && /[א-ת]/.test(i.alt))).length, old: im.filter(i => /\/(g[1-4]|u\d+)-/.test(i.src)).length, ratio: ci.map(i => { const r = i.getBoundingClientRect(); return Math.round(r.width / r.height * 100); }).filter(x => x !== 80).length }; });
-    check("עבודות " + lang + ": 9 תחומים, 18 תמונות, כולן נטענות, עם תיאור בשפת הדף וביחס אחיד", s.cats === 9 && s.pics === 18 && s.broken.length === 0 && s.noAlt === 0 && s.old === 0 && s.ratio === 0, s);
+    check("עבודות " + lang + ": 13 תחומים, 26 תמונות, כולן נטענות, עם תיאור בשפת הדף וביחס אחיד", s.cats === 13 && s.pics === 26 && s.broken.length === 0 && s.noAlt === 0 && s.old === 0 && s.ratio === 0, s);
     if (lang === "he") { await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_desk.png") }); await p.screenshot({ path: path.join(SHOTS, "site_full_he.png"), fullPage: true }); }
     await p.browserContext().close(); }
   p = await open("index.html", 390, 844); await scrollAll(p); await p.evaluate(() => document.getElementById("projects").scrollIntoView({ behavior: "instant" })); await sleep(600); await p.screenshot({ path: path.join(SHOTS, "site_works_mob.png") }); await p.browserContext().close();
@@ -156,7 +156,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   check("מעמוד ההצהרה ל'צור קשר': כן מגיע לסעיף", s.y > 500 && Math.abs(s.top) < 120, s);
   await p.browserContext().close();
   // ----- הודעות המלצה קופצות -----
-  p = await open("index.html", 390, 844); await scrollAll(p); await sleep(3000);
+  p = await open("index.html", 390, 844); await scrollAll(p); await p.waitForFunction(() => document.getElementById("proof").classList.contains("on"), { timeout: 30000 }).catch(() => {});
   s = await p.evaluate(() => { const b = document.getElementById("proof"); return { on: b.classList.contains("on"), t: b.textContent.replace(/\s+/g, " ").trim(), demo: !!b.querySelector(".pf-demo") }; });
   check("האתר הרגיל: קופצים רק הלקוחות האמיתיים, בלי תווית דוגמה ובלי שמות מומצאים", s.on && !s.demo && /ד\.ט\. מקריית נטפים|מועצה מקומית קדומים/.test(s.t) && !/הוד השרון|רעננה/.test(s.t), s);
   await p.browserContext().close();
@@ -190,17 +190,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(() => document.querySelectorAll(".zoom")[2].focus()); await p.keyboard.press("Enter"); await sleep(700);
   const lbState = () => p.evaluate(() => { const lb = document.getElementById("lb"), im = document.getElementById("lb-img"), r = im.getBoundingClientRect(); return { open: lb.open, src: im.getAttribute("src"), ok: im.complete && im.naturalWidth > 0, alt: im.alt, cap: document.getElementById("lb-cap").textContent, n: document.getElementById("lb-n").textContent, inside: lb.contains(document.activeElement), lock: document.documentElement.classList.contains("lb-open"), fits: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight + 1 && r.right <= innerWidth + 1 && r.width > 200, op: getComputedStyle(lb).opacity, back: document.activeElement === document.querySelectorAll(".zoom")[2] }; });
   s = await lbState();
-  check("הגדלה: Enter על תמונה פותח אותה בגדול, עם כיתוב, מונה ומיקוד בתוך החלון", s.open && /c2a-960\.jpg$/.test(s.src) && s.ok && s.alt === "דלתות ומחיצות למשרדים 1" && s.cap === "דלתות ומחיצות למשרדים" && s.n === "3 / 18" && s.inside && s.lock && s.fits && s.op === "1", s);
+  check("הגדלה: Enter על תמונה פותח אותה בגדול, עם כיתוב, מונה ומיקוד בתוך החלון", s.open && /vitrines-001\.webp$/.test(s.src) && s.ok && s.alt === "ויטרינות 1" && s.cap === "ויטרינות" && s.n === "3 / 26" && s.inside && s.lock && s.fits && s.op === "1", s);
   await axe(p, "עם תמונה מוגדלת");
   await p.screenshot({ path: path.join(SHOTS, "site_lb_desk.png") });
   await p.keyboard.press("ArrowLeft"); await sleep(500); s = await lbState();
-  check("הגדלה: חץ שמאלה בעברית עובר לתמונה הבאה", s.n === "4 / 18" && /c2b-960\.jpg$/.test(s.src) && s.ok, s);
+  check("הגדלה: חץ שמאלה בעברית עובר לתמונה הבאה", s.n === "4 / 26" && /vitrines-002\.webp$/.test(s.src) && s.ok, s);
   await p.keyboard.press("ArrowRight"); await p.keyboard.press("ArrowRight"); await sleep(500); s = await lbState();
-  check("הגדלה: חץ ימינה חוזר אחורה", s.n === "2 / 18" && s.ok, s);
+  check("הגדלה: חץ ימינה חוזר אחורה", s.n === "2 / 26" && s.ok, s);
   await p.click(".lb-prev"); await sleep(400); s = await lbState();
-  check("הגדלה: כפתור הקודם, ומהראשונה ממשיכים לאחרונה", s.n === "1 / 18", s);
+  check("הגדלה: כפתור הקודם, ומהראשונה ממשיכים לאחרונה", s.n === "1 / 26", s);
   await p.click(".lb-prev"); await sleep(400); s = await lbState();
-  check("הגדלה: מעבר מעגלי לתמונה האחרונה", s.n === "18 / 18" && s.ok, s);
+  check("הגדלה: מעבר מעגלי לתמונה האחרונה", s.n === "26 / 26" && s.ok, s);
   await p.keyboard.press("Escape"); await sleep(500); s = await lbState();
   check("הגדלה: Escape סוגר, משחרר את הגלילה ומחזיר את המיקוד לתמונה", !s.open && !s.lock && s.back, s);
   await p.evaluate(() => document.querySelectorAll(".zoom")[5].click()); await sleep(500);
@@ -217,12 +217,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   check("הגדלה fr: התוויות בצרפתית", /^Agrandir l'image: Fenêtres/.test(s.z) && s.nx === "Image suivante" && s.he === 0, s);
   await p.evaluate(() => { const z = document.querySelectorAll(".zoom")[6]; z.scrollIntoView({ behavior: "instant", block: "center" }); z.click(); }); await sleep(700);
   s = await p.evaluate(() => { const im = document.getElementById("lb-img").getBoundingClientRect(); const bs = [...document.querySelectorAll(".lb-b")].map(b => b.getBoundingClientRect()); return { fits: im.top >= 0 && im.bottom <= innerHeight + 1 && im.left >= 0 && im.right <= innerWidth + 1 && im.width > 250, btn: bs.every(r => r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth), over: document.documentElement.scrollWidth > innerWidth + 1, n: document.getElementById("lb-n").textContent }; });
-  check("הגדלה בטלפון: התמונה והכפתורים בתוך המסך, כפתורים 44 פיקסלים לפחות", s.fits && s.btn && !s.over && s.n === "7 / 18", s);
+  check("הגדלה בטלפון: התמונה והכפתורים בתוך המסך, כפתורים 44 פיקסלים לפחות", s.fits && s.btn && !s.over && s.n === "7 / 26", s);
   await p.screenshot({ path: path.join(SHOTS, "site_lb_mob.png") });
   // החלקה באצבע: בכיוון שמאל-לימין (ltr) החלקה שמאלה = הבא
   await p.evaluate(() => { const lb = document.getElementById("lb"); const ev = (t, x) => { const e = new Event(t, { bubbles: true }); e.touches = t === "touchstart" ? [{ clientX: x }] : []; e.changedTouches = [{ clientX: x }]; lb.dispatchEvent(e); }; ev("touchstart", 300); ev("touchend", 120); }); await sleep(400);
   s = await p.evaluate(() => document.getElementById("lb-n").textContent);
-  check("הגדלה בטלפון: החלקה שמאלה עוברת לתמונה הבאה", s === "8 / 18", s);
+  check("הגדלה בטלפון: החלקה שמאלה עוברת לתמונה הבאה", s === "8 / 26", s);
   await p.browserContext().close();
   // הפחתת תנועה: אין ספירה ואין הזזה, התמונה עדיין נפתחת
   p = await open("index.html", 1440, 900, { reduce: true }); await scrollAll(p);
@@ -230,6 +230,40 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   s = await p.evaluate(() => ({ open: document.getElementById("lb").open, tf: getComputedStyle(document.getElementById("lb")).transform, num: document.querySelector(".num").textContent, h1: getComputedStyle(document.querySelector(".hero h1")).animationName }));
   check("הפחתת תנועה: התמונה נפתחת בלי הזזה, בלי ספירה ובלי כניסת כותרת", s.open && (s.tf === "none" || s.tf === "matrix(1, 0, 0, 1, 0, 0)") && s.num === "12" && s.h1 === "none", s);
   await p.browserContext().close();
+  // ----- עמוד העבודות -----
+  { const G = JSON.parse(fs.readFileSync(path.join(__dirname, "gallery.json"), "utf8")); const cats = Object.keys(G).filter(c => G[c].length); const total = cats.reduce((a, c) => a + G[c].length, 0);
+    const miss = []; for (const c of cats) for (const it of G[c]) for (const sfx of ["", "-t"]) { const f = path.join(__dirname, "..", "assets", "g", c + "-" + String(it.n).padStart(3, "0") + sfx + ".webp"); if (!fs.existsSync(f) || fs.statSync(f).size < 2000) miss.push(f); }
+    check("עבודות: לכל תמונה ברשימה יש קובץ ממוזער וקובץ גדול (" + total + " תמונות)", miss.length === 0 && total > 400, miss.slice(0, 5));
+    for (const [lang, w, h] of [["he", 1440, 900], ["fr", 390, 844], ["en", 320, 700]]) {
+      p = await open("works.html" + (lang === "he" ? "" : "?lang=" + lang), w, h);
+      s = await p.evaluate(() => ({ over: document.documentElement.scrollWidth > innerWidth + 1, secs: document.querySelectorAll(".gcat").length, vis: [...document.querySelectorAll(".gcat:not([hidden])")].map(x => x.dataset.g), imgs: document.querySelectorAll(".gcat img").length, pressed: [...document.querySelectorAll('.chip[aria-pressed="true"]')].map(b => b.dataset.cat), he: document.documentElement.lang !== "he" ? [...document.querySelectorAll("main *")].filter(e => e.children.length === 0 && /[א-ת]/.test(e.textContent + (e.alt || "") + (e.getAttribute("aria-label") || ""))).length : 0, title: document.title, chipH: Math.min(...[...document.querySelectorAll(".chip")].map(b => b.getBoundingClientRect().height)) }));
+      check("עבודות " + lang + " " + w + ": כל התחומים והתמונות בדף, מוצג רק הראשון, בלי גלילה לרוחב", !s.over && s.secs === cats.length && s.imgs === total && s.vis.join() === cats[0] && s.pressed.join() === cats[0] && s.he === 0 && s.chipH >= 44 && (lang === "he" || !/[א-ת]/.test(s.title)), s);
+      await scrollAll(p);
+      s = await p.evaluate(() => { const im = [...document.querySelectorAll(".gcat:not([hidden]) img")]; return { n: im.length, bad: im.filter(i => !(i.complete && i.naturalWidth > 0)).length, sq: im.filter(i => { const r = i.parentElement.getBoundingClientRect(); return Math.abs(r.width - r.height) > 1.5; }).length }; });
+      check("עבודות " + lang + ": כל התמונות של התחום המוצג נטענות, באריחים ריבועיים", s.n === G[cats[0]].length && s.bad === 0 && s.sq === 0, s);
+      await axe(p, "עמוד העבודות " + lang);
+      if (lang !== "en") await p.screenshot({ path: path.join(SHOTS, "site_works_page_" + lang + ".png") });
+      await p.evaluate(() => { scrollTo({ top: 0, behavior: "instant" }); document.querySelector('.chip[data-cat="pergolas"]').click(); }); await sleep(300);
+      s = await p.evaluate(() => ({ vis: [...document.querySelectorAll(".gcat:not([hidden])")].map(x => x.dataset.g).join(), url: location.search, pressed: document.querySelectorAll('.chip[aria-pressed="true"]').length }));
+      check("עבודות " + lang + ": לחיצה על תחום מחליפה את התצוגה ומעדכנת את הכתובת", s.vis === "pergolas" && /cat=pergolas/.test(s.url) && s.pressed === 1 && (lang === "he" || s.url.includes("lang=" + lang)), s);
+      await p.browserContext().close(); }
+    p = await open("works.html?cat=showers", 1440, 900);
+    await p.evaluate(() => document.querySelector(".gcat:not([hidden]) .zoom").click()); await sleep(900);
+    s = await p.evaluate(() => { const im = document.getElementById("lb-img"); return { vis: document.querySelector(".gcat:not([hidden])").dataset.g, open: document.getElementById("lb").open, src: im.getAttribute("src"), ok: im.complete && im.naturalWidth > 600, n: document.getElementById("lb-n").textContent, cap: document.getElementById("lb-cap").textContent }; });
+    check("עבודות: קישור ישיר לתחום פותח אותו, וההגדלה מדפדפת רק בתוך התחום", s.vis === "showers" && s.open && /showers-001\.webp$/.test(s.src) && s.ok && s.n === "1 / " + G.showers.length && s.cap === "מקלחונים", s);
+    await p.screenshot({ path: path.join(SHOTS, "site_works_lb.png") });
+    await p.keyboard.press("ArrowRight"); await sleep(500); s = await p.evaluate(() => document.getElementById("lb-n").textContent);
+    check("עבודות: דפדוף אחורה מהראשונה מגיע לאחרונה של אותו תחום", s === G.showers.length + " / " + G.showers.length, s);
+    await p.browserContext().close();
+    p = await open("works.html?cat=nonsense", 800, 700); s = await p.evaluate(() => [...document.querySelectorAll(".gcat:not([hidden])")].map(x => x.dataset.g).join());
+    check("עבודות: תחום לא מוכר בכתובת מציג את התחום הראשון", s === cats[0], s); await p.browserContext().close();
+    p = await open("index.html?lang=fr", 1440, 900);
+    s = await p.evaluate(() => ({ href: document.querySelector(".more").getAttribute("href"), n: document.querySelectorAll(".more").length, txt: document.querySelector(".more").textContent }));
+    check("בית fr: קישור 'כל התמונות' לכל תחום, שומר על השפה ועל התחום", s.href === "works.html?cat=" + cats[0] + "&lang=fr" && s.n === cats.length && /^Toutes les photos: Fenêtres \(\d+\)$/.test(s.txt), s);
+    await p.click(".more"); await sleep(2200);
+    s = await p.evaluate(() => ({ path: location.pathname, lang: document.documentElement.lang, h1: document.querySelector("h1").textContent, y: scrollY }));
+    check("בית fr: הקישור מוביל לעמוד העבודות בצרפתית, מתחילת הדף", /works\.html$/.test(s.path) && s.lang === "fr" && s.h1 === "Nos réalisations" && s.y === 0, s);
+    await p.browserContext().close(); }
   // ----- לוגו -----
   for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);
     s = await p.evaluate(() => { const m = document.querySelector(".logo img"), f = document.querySelector("footer .brand img"), r = m.getBoundingClientRect(); return { mark: m.complete && m.naturalWidth > 0, h: Math.round(r.height), inNav: r.top >= 0 && r.bottom <= 80, full: f.complete && f.naturalWidth > 0, fw: Math.round(f.getBoundingClientRect().width), name: document.querySelector(".logo").textContent.trim() }; });

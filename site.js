@@ -27,7 +27,8 @@
       "facts.3t": "Complex problems solved", "facts.3p": "Unusual openings, renovations and fixing work that went wrong.",
       "facts.4t": "Fast delivery", "facts.4p": "From order to installation, among the fastest lead times in Israel.",
       "gal.h2": "Our work.", "gal.lead": "A selection of projects we designed, manufactured and installed, by category.",
-      "cat.1": "Windows and glazed walls", "cat.2": "Office doors and partitions", "cat.3": "Pergolas", "cat.4": "Shower enclosures", "cat.5": "Fences and gates", "cat.6": "Shading", "cat.7": "Aluminium cladding", "cat.8": "Handles and hardware", "cat.9": "Pleated insect screens",
+      "g.windows": "Windows", "g.vitrines": "Glazed sliding walls", "g.belgian": "Steel-look (Belgian) profiles", "g.doors": "Doors", "g.shutters": "Shutters", "g.closures": "Winter and patio enclosures", "g.showers": "Shower enclosures", "g.pergolas": "Pergolas", "g.fences": "Fences and gates", "g.office": "Office doors and partitions", "g.cladding": "Aluminium cladding", "g.screens": "Pleated insect screens", "g.handles": "Handles", "g.more": "All photos",
+      "wk.title": "Our work | Alum Elbaz", "wk.h1": "Our work", "wk.lead": "Every photo, by category. Click a photo to enlarge it.", "wk.cats": "Categories",
       "proc.h2": "From measurement to the finished home.",
       "proc.1t": "On-site measurement", "proc.1p": "We come to you, measure every opening and learn what matters to you.",
       "proc.2t": "Design and quote", "proc.2p": "Together we choose the system, colour and glazing. A clear, itemised quote.",
@@ -74,7 +75,8 @@
       "facts.3t": "Solutions aux cas complexes", "facts.3p": "Ouvertures hors normes, rénovations et reprise de travaux mal réalisés.",
       "facts.4t": "Livraison rapide", "facts.4p": "De la commande à la pose, parmi les délais les plus courts d'Israël.",
       "gal.h2": "Nos réalisations.", "gal.lead": "Une sélection de projets que nous avons conçus, fabriqués et posés, par catégorie.",
-      "cat.1": "Fenêtres et baies vitrées", "cat.2": "Portes et cloisons de bureau", "cat.3": "Pergolas", "cat.4": "Parois de douche", "cat.5": "Clôtures et portails", "cat.6": "Brise-soleil", "cat.7": "Bardage aluminium", "cat.8": "Poignées et quincaillerie", "cat.9": "Moustiquaires plissées",
+      "g.windows": "Fenêtres", "g.vitrines": "Baies vitrées coulissantes", "g.belgian": "Style verrière (profil belge)", "g.doors": "Portes", "g.shutters": "Volets", "g.closures": "Fermetures de terrasse et vérandas", "g.showers": "Parois de douche", "g.pergolas": "Pergolas", "g.fences": "Clôtures et portails", "g.office": "Portes et cloisons de bureau", "g.cladding": "Bardage aluminium", "g.screens": "Moustiquaires plissées", "g.handles": "Poignées", "g.more": "Toutes les photos",
+      "wk.title": "Nos réalisations | Alum Elbaz", "wk.h1": "Nos réalisations", "wk.lead": "Toutes les photos, par catégorie. Cliquez sur une photo pour l'agrandir.", "wk.cats": "Catégories",
       "proc.h2": "De la prise de mesures à la maison terminée.",
       "proc.1t": "Mesures sur place", "proc.1p": "Nous venons chez vous, mesurons chaque ouverture et comprenons vos priorités.",
       "proc.2t": "Conception et devis", "proc.2p": "Nous choisissons ensemble le système, la teinte et le vitrage. Un devis clair et détaillé.",
@@ -110,7 +112,7 @@
   each("[data-i18n]", function (el) { orig.text.set(el, el.textContent); });
   each("[data-i18n-html]", function (el) { orig.html.set(el, el.innerHTML); });
   each("[data-i18n-label]", function (el) { orig.attr.set(el, el.getAttribute("aria-label")); });
-  var heCat = {}; each("h3[data-i18n]", function (el) { heCat[el.getAttribute("data-i18n")] = el.textContent; });
+  var heCat = {}; each("[data-i18n^='g.']", function (el) { heCat[el.getAttribute("data-i18n")] = el.textContent; });
 
   function setLang(lang, save) {
     if (["he", "en", "fr"].indexOf(lang) < 0) lang = "he";
@@ -125,7 +127,11 @@
     document.title = dict && dict[tk] ? dict[tk] : orig.title;
     if (metaDesc) metaDesc.setAttribute("content", dict && dict.desc ? dict.desc : orig.desc);
     each(".langs button", function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === lang)); });
-    each("a[data-keep-lang]", function (a) { var u = a.getAttribute("href").split("?")[0]; a.setAttribute("href", lang === "he" ? u : u + "?lang=" + lang); });
+    each("a[data-keep-lang]", function (a) {
+      var p = a.getAttribute("href").split("?"), q = (p[1] || "").split("&").filter(function (x) { return x && x.indexOf("lang=") !== 0; });
+      if (lang !== "he") q.push("lang=" + lang);
+      a.setAttribute("href", p[0] + (q.length ? "?" + q.join("&") : ""));
+    });
     if (save) { try { localStorage.setItem("ae_lang", lang); } catch (e) {} }
     AE.lang = lang;
   }
@@ -248,21 +254,40 @@
     }
   })();
 
+  /* ---- עמוד העבודות: תחום אחד מוצג בכל פעם ---- */
+  (function () {
+    var chips = document.querySelectorAll(".chip"), secs = document.querySelectorAll(".gcat");
+    if (!chips.length) return;
+    function show(c, push) {
+      var ok = false; Array.prototype.forEach.call(secs, function (s) { if (s.getAttribute("data-g") === c) ok = true; });
+      if (!ok) c = secs[0].getAttribute("data-g");
+      Array.prototype.forEach.call(secs, function (s) { s.hidden = s.getAttribute("data-g") !== c; });
+      Array.prototype.forEach.call(chips, function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-cat") === c)); });
+      if (push) { try { var q = new URLSearchParams(location.search); q.set("cat", c); history.replaceState(null, "", location.pathname + "?" + q.toString()); } catch (e) {} }
+    }
+    var first = null; try { first = new URLSearchParams(location.search).get("cat"); } catch (e) {}
+    show(first, false);
+    Array.prototype.forEach.call(chips, function (b) { b.addEventListener("click", function () { show(b.getAttribute("data-cat"), true); }); });
+  })();
+
   /* ---- תצוגת תמונה מוגדלת ---- */
   (function () {
-    var lb = document.getElementById("lb"), zs = document.querySelectorAll(".zoom");
-    if (!lb || !zs.length || !lb.showModal) return;
+    var lb = document.getElementById("lb"), all = document.querySelectorAll(".zoom"), zs = all;
+    if (!lb || !all.length || !lb.showModal) return;
     var im = document.getElementById("lb-img"), cap = document.getElementById("lb-cap"), cnt = document.getElementById("lb-n"), cur = 0, x0 = null;
     function go(i) {
       cur = (i + zs.length) % zs.length;
-      var src = zs[cur].firstElementChild, big = src.getAttribute("src").replace(/-\d+\.jpg$/, "-960.jpg");
+      var src = zs[cur].firstElementChild, big = src.getAttribute("data-full");
       if (im.getAttribute("src") !== big) { im.classList.add("sw"); im.setAttribute("src", big); }
       im.alt = src.alt; cap.textContent = src.alt.replace(/ \d+$/, ""); cnt.textContent = (cur + 1) + " / " + zs.length;
     }
     function step(n) { go(cur + n); }
     im.addEventListener("load", function () { im.classList.remove("sw"); });
     im.addEventListener("error", function () { im.classList.remove("sw"); });
-    Array.prototype.forEach.call(zs, function (z, i) { z.addEventListener("click", function () { go(i); d.classList.add("lb-open"); lb.showModal(); }); });
+    Array.prototype.forEach.call(all, function (z) { z.addEventListener("click", function () {
+      var g = z.closest("[data-g]"); zs = g ? g.querySelectorAll(".zoom") : all;
+      go(Array.prototype.indexOf.call(zs, z)); d.classList.add("lb-open"); lb.showModal();
+    }); });
     lb.addEventListener("close", function () { d.classList.remove("lb-open"); });
     lb.addEventListener("click", function (e) { if (e.target === lb) lb.close(); });
     lb.querySelector(".lb-x").addEventListener("click", function () { lb.close(); });
