@@ -13,7 +13,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   async function open(url, w, h, opts) {
     const ctx = await browser.createBrowserContext(); const p = await ctx.newPage();
     await p.setViewport({ width: w, height: h, deviceScaleFactor: 1, isMobile: w < 800, hasTouch: w < 800 });
-    if (opts && opts.reduce) await p.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+    await p.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: opts && opts.reduce ? "reduce" : "no-preference" }]); // לא תלוי בהגדרת התנועה של המחשב שמריץ את הבדיקות
     p.on("pageerror", e => errors.push("pageerror " + e.message));
     p.on("console", m => { if (m.type() === "error") errors.push("console " + m.text()); });
     p.on("requestfailed", r => errors.push("reqfail " + r.url()));

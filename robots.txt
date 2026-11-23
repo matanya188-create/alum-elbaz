@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alum-elbaz.co.il/sitemap.xml

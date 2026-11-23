@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # מייצר את index.html ואת accessibility.html מאותם חלקים משותפים (ראש, ניווט, תחתית).
 # הרצה: python tools/gen.py  (מתוך תיקיית האתר)
-import io, os, json, hashlib
+import io, os, json, hashlib, datetime
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WA = "https://wa.me/972543547192"
 
@@ -18,7 +18,14 @@ HEAD = '''<!DOCTYPE html>
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
-<meta property="og:image" content="assets/hero-1920.jpg">
+<meta property="og:url" content="https://alum-elbaz.co.il/{page}">
+<meta property="og:site_name" content="אלום אלבז">
+<meta property="og:locale" content="he_IL">
+<meta property="og:image" content="https://alum-elbaz.co.il/assets/hero-1280.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://alum-elbaz.co.il/{page}">
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="favicon.png">
 <link rel="preload" href="fonts/plex-hebrew-600.woff2" as="font" type="font/woff2" crossorigin>
@@ -269,16 +276,24 @@ DOC = '''
 
 '''
 
-index = (HEAD.format(title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver("boot.js")) + nav(True)
+index = (HEAD.format(page="", title=T1, desc=D1, tk="", vcss=ver("styles.css"), vboot=ver("boot.js")) + nav(True)
          + MAIN.format(hero=pic("hero", eager=True), wa=WA, tiles=tiles, facts=li(FACTS), gal=gal, steps=li(STEPS), endimg=pic("contact"))
          # אותה גלריה מוטמעת גם בעמוד הבית (מוסתרת), כך שהקישורים "לכל התמונות" מחליפים תצוגה בלי לטעון עמוד
          + WORKS.format(chips=chips, gsecs=gsecs).replace('<main id="main" class="works">', '<section id="wv" class="works" tabindex="-1" hidden>').replace("</main>", "</section>")
          + PROOF + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
-acc = (HEAD.format(title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
+acc = (HEAD.format(page="accessibility.html", title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
        + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
-works = (HEAD.format(title="העבודות שלנו | אלום אלבז", desc="כל תמונות העבודות של אלום אלבז בע״מ לפי תחום: חלונות, ויטרינות, פרופילים, דלתות, מקלחונים, פרגולות ועוד.", tk=' data-title-key="wk.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
+works = (HEAD.format(page="works.html", title="העבודות שלנו | אלום אלבז", desc="כל תמונות העבודות של אלום אלבז בע״מ לפי תחום: חלונות, ויטרינות, פרופילים, דלתות, מקלחונים, פרגולות ועוד.", tk=' data-title-key="wk.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
          + nav(False) + WORKS.format(chips=chips, gsecs=gsecs) + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 io.open(os.path.join(ROOT, "works.html"), "w", encoding="utf-8", newline="\n").write(works)
 io.open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8", newline="\n").write(index)
 io.open(os.path.join(ROOT, "accessibility.html"), "w", encoding="utf-8", newline="\n").write(acc)
+# קבצים למנועי חיפוש
+SITE = "https://alum-elbaz.co.il/"
+def lastmod(f): return datetime.date.fromtimestamp(os.path.getmtime(os.path.join(ROOT, f))).isoformat()
+sm = "\n".join(['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+               + ["  <url><loc>%s%s</loc><lastmod>%s</lastmod></url>" % (SITE, pg, lastmod(f)) for pg, f in [("", "index.html"), ("works.html", "works.html"), ("accessibility.html", "accessibility.html")]]
+               + ["</urlset>", ""])
+io.open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8", newline="\n").write(sm)
+io.open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8", newline="\n").write("\n".join(["User-agent: *", "Allow: /", "", "Sitemap: " + SITE + "sitemap.xml", ""]))
 print("ok", len(index), len(acc))
