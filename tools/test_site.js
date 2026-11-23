@@ -113,7 +113,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   for (const lang of ["he", "en", "fr"]) {
     p = await open("accessibility.html?lang=" + lang, 390, 844);
     s = await p.evaluate(() => ({ h1: document.querySelector("h1").textContent, title: document.title, tel: !!document.querySelector('main a[href="tel:+972543547192"]'), mail: !!document.querySelector('main a[href="mailto:alumelbaz@gmail.com"]'), name: /אילן אלבז|Ilan Elbaz/.test(document.querySelector("main").textContent), back: document.querySelector(".back").getAttribute("href") }));
-    check("הצהרת נגישות " + lang + ": כותרת, רכז, טלפון ומייל", s.tel && s.mail && s.name && s.h1.length > 5 && (lang === "he" ? /[א-ת]/.test(s.title) : !/[א-ת]/.test(s.title)) && s.back === (lang === "he" ? "index.html" : "index.html?lang=" + lang), s);
+    check("הצהרת נגישות " + lang + ": כותרת, רכז, טלפון ומייל", s.tel && s.mail && s.name && s.h1.length > 5 && (lang === "he" ? /[א-ת]/.test(s.title) : !/[א-ת]/.test(s.title)) && s.back === (lang === "he" ? "./" : "./?lang=" + lang), s);
     o = await overflow(p); check("הצהרת נגישות " + lang + ": בלי גלישה", o.over <= 0 && o.cut.length === 0, o);
     await axe(p, "הצהרת נגישות " + lang);
     if (lang === "he") await p.screenshot({ path: path.join(SHOTS, "site_statement_he.png") });
@@ -151,7 +151,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await c2.close();
     await ctx.close(); }
   p = await open("accessibility.html", 390, 844); await p.click(".menu-btn"); await sleep(200);
-  await Promise.all([p.waitForNavigation({ waitUntil: "networkidle0" }), p.click('#mnav a[href="index.html#contact"]')]); await sleep(1500);
+  await Promise.all([p.waitForNavigation({ waitUntil: "networkidle0" }), p.click('#mnav a[href="./#contact"]')]); await sleep(1500);
   s = await p.evaluate(() => ({ top: Math.round(document.getElementById("contact").getBoundingClientRect().top), y: Math.round(scrollY) }));
   check("מעמוד ההצהרה ל'צור קשר': כן מגיע לסעיף", s.y > 500 && Math.abs(s.top) < 120, s);
   await p.browserContext().close();
@@ -265,7 +265,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.evaluate(() => document.querySelectorAll(".more")[6].click()); await sleep(700);
     const vs = () => p.evaluate(() => ({ path: location.pathname, q: location.search, fs: !!document.fullscreenElement, home: !document.getElementById("main").hidden, wv: !document.getElementById("wv").hidden, vis: [...document.querySelectorAll("#wv .gcat:not([hidden])")].map(x => x.dataset.g).join(), h1: document.querySelector("#wv h1").textContent, title: document.title, y: scrollY, lang: document.documentElement.lang }));
     s = await vs();
-    check("בית fr: 'כל התמונות' מציג את התחום בתוך אותו עמוד, מתחילת הדף, ונשאר במסך מלא", /index\.html$/.test(s.path) && /view=works/.test(s.q) && /cat=showers/.test(s.q) && /lang=fr/.test(s.q) && s.fs && !s.home && s.wv && s.vis === "showers" && s.h1 === "Nos réalisations" && s.title === "Nos réalisations | Alum Elbaz" && s.y === 0 && s.lang === "fr", s);
+    check("בית fr: 'כל התמונות' מציג את התחום בתוך אותו עמוד, מתחילת הדף, ונשאר במסך מלא", /\/$/.test(s.path) && /view=works/.test(s.q) && /cat=showers/.test(s.q) && /lang=fr/.test(s.q) && s.fs && !s.home && s.wv && s.vis === "showers" && s.h1 === "Nos réalisations" && s.title === "Nos réalisations | Alum Elbaz" && s.y === 0 && s.lang === "fr", s);
     await p.evaluate(() => document.querySelector("#wv .gcat:not([hidden]) .zoom").click()); await sleep(800);
     s = await p.evaluate(() => ({ fs: !!document.fullscreenElement, open: document.getElementById("lb").open, n: document.getElementById("lb-n").textContent, src: document.getElementById("lb-img").getAttribute("src") }));
     check("בית fr: הגדלת תמונה מתוך כל העבודות נשארת במסך מלא ומדפדפת בתוך התחום", s.fs && s.open && /^1 \/ \d+$/.test(s.n) && /showers-001\.webp$/.test(s.src), s);

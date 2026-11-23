@@ -3,6 +3,8 @@
   "use strict";
   var AE = window.__AE || { lang: "he", prefs: { fs: 0, hc: false, ul: false, nomo: false } };
   var d = document.documentElement;
+  /* כתובת נקייה: עמוד הבית מוצג בלי שם הקובץ */
+  try { if (/\/index\.html$/.test(location.pathname) && /^https?:$/.test(location.protocol)) history.replaceState(history.state, "", location.pathname.replace(/index\.html$/, "") + location.search + location.hash); } catch (e) {}
 
   /* העברית נמצאת ב-HTML עצמו; כאן רק האנגלית והצרפתית. כל המחרוזות קבועות (לא קלט משתמש). */
   var T = {

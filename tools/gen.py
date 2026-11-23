@@ -92,7 +92,7 @@ def ver(name):
 
 
 def nav(home):
-    h = "" if home else "index.html"
+    h = "" if home else "./"
     return NAV.format(h=h, wa=WA, links=LINKS.format(h=h))
 
 
@@ -174,7 +174,7 @@ WORKS = '''
 {chips}
     </div>
 {gsecs}
-    <a class="back" href="index.html" data-keep-lang data-i18n="st.back">חזרה לעמוד הבית</a>
+    <a class="back" href="./" data-keep-lang data-i18n="st.back">חזרה לעמוד הבית</a>
   </div>
 </main>
 
@@ -270,7 +270,7 @@ DOC = '''
     <h2 data-i18n="st.h2d">רכז הנגישות</h2>
     <p data-i18n-html="st.pd">אילן אלבז<br>טלפון: <a href="tel:+972543547192" dir="ltr">054-354-7192</a><br>מייל: <a href="mailto:alumelbaz@gmail.com" dir="ltr">alumelbaz@gmail.com</a></p>
     <p data-i18n="st.updated">ההצהרה עודכנה לאחרונה ב-12 בנובמבר 2026.</p>
-    <a class="back" href="index.html" data-keep-lang data-i18n="st.back">חזרה לעמוד הבית</a>
+    <a class="back" href="./" data-keep-lang data-i18n="st.back">חזרה לעמוד הבית</a>
   </div>
 </main>
 
