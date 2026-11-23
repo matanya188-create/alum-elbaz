@@ -155,35 +155,6 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   s = await p.evaluate(() => ({ top: Math.round(document.getElementById("contact").getBoundingClientRect().top), y: Math.round(scrollY) }));
   check("מעמוד ההצהרה ל'צור קשר': כן מגיע לסעיף", s.y > 500 && Math.abs(s.top) < 120, s);
   await p.browserContext().close();
-  // ----- הודעות המלצה קופצות -----
-  p = await open("index.html", 390, 844); await scrollAll(p); await p.waitForFunction(() => document.getElementById("proof").classList.contains("on"), { timeout: 30000 }).catch(() => {});
-  s = await p.evaluate(() => { const b = document.getElementById("proof"); return { on: b.classList.contains("on"), t: b.textContent.replace(/\s+/g, " ").trim(), demo: !!b.querySelector(".pf-demo") }; });
-  check("האתר הרגיל: קופצים רק הלקוחות האמיתיים, בלי תווית דוגמה ובלי שמות מומצאים", s.on && !s.demo && /ד\.ט\. מקריית נטפים|מועצה מקומית קדומים/.test(s.t) && !/הוד השרון|רעננה/.test(s.t), s);
-  await p.browserContext().close();
-  for (const [lang, w] of [["he", 390], ["fr", 1440], ["en", 320]]) {
-    p = await open("index.html?proof=demo&lang=" + lang, w, 800);
-    check("הדגמה " + lang + ": לפני גלילה אין הודעה", await p.evaluate(() => document.getElementById("proof").hidden));
-    await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(2600);
-    s = await p.evaluate(() => { const b = document.getElementById("proof"), r = b.getBoundingClientRect(), a = document.querySelector(".fab.acc").getBoundingClientRect(), wa = document.querySelector(".fab.wa").getBoundingClientRect(); const hit = q => !(r.right < q.left || r.left > q.right || r.bottom < q.top || r.top > q.bottom); return { on: !b.hidden && b.classList.contains("on"), t1: b.querySelector(".pf-1").textContent, t2: b.querySelector(".pf-2").textContent, demo: !!b.querySelector(".pf-demo"), fixed: getComputedStyle(b).position, inView: r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight && r.top >= 0, left: r.left < innerWidth / 2, hitAcc: hit(a), hitWa: hit(wa), lines: Math.round(b.querySelector(".pf-1").getBoundingClientRect().height) }; });
-    check("הדגמה " + lang + ": אחרי גלילה קופצת הודעה נעוצה, בתוך המסך, מסומנת 'דוגמה', ולא מכסה את הכפתורים הצפים", s.on && s.demo && s.fixed === "fixed" && s.inView && !s.hitAcc && !s.hitWa && s.t1.length > 12 && s.t2.length > 5 && (lang === "he" ? /הזמין |הזמינה /.test(s.t1) && s.left : !/[א-ת]/.test(s.t1 + s.t2)), s);
-    if (lang === "he") { await axe(p, "עם הודעת המלצה פתוחה", ".hero"); await p.screenshot({ path: path.join(SHOTS, "site_proof_mob.png") }); }
-    if (lang === "fr") await p.screenshot({ path: path.join(SHOTS, "site_proof_desk_fr.png") });
-    if (lang === "he") {
-      const first = s.t1; await sleep(6800);
-      check("ההודעה נעלמת אחרי כ-6 שניות", await p.evaluate(() => document.getElementById("proof").hidden));
-      await sleep(5600);
-      const s2 = await p.evaluate(() => ({ on: document.getElementById("proof").classList.contains("on"), t1: document.querySelector(".pf-1").textContent }));
-      check("אחרי הפסקה קופצת הודעה של לקוח אחר", s2.on && s2.t1 !== first, s2);
-      await p.click(".pf-x"); await sleep(900);
-      check("לחיצה על X סוגרת", await p.evaluate(() => document.getElementById("proof").hidden));
-      await p.reload({ waitUntil: "networkidle0" }); await sleep(1600); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
-      check("אחרי X ההודעות לא חוזרות באותו ביקור", await p.evaluate(() => document.getElementById("proof").hidden));
-    }
-    await p.browserContext().close();
-  }
-  p = await open("index.html?proof=demo", 390, 844, { reduce: true }); await p.evaluate(() => document.getElementById("services").scrollIntoView({ behavior: "instant" })); await sleep(3000);
-  check("מכשיר שמבקש פחות תנועה: אין הודעות קופצות", await p.evaluate(() => document.getElementById("proof").hidden));
-  await p.browserContext().close();
   // ----- תצוגת תמונה מוגדלת -----
   p = await open("index.html", 1440, 900); await scrollAll(p);
   await p.evaluate(() => document.querySelectorAll(".zoom")[2].scrollIntoView({ behavior: "instant", block: "center" })); await sleep(300);
@@ -311,7 +282,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // ----- קישורים ואבטחה -----
   p = await open("index.html", 1440, 900);
   s = await p.evaluate(() => ({ ext: [...document.querySelectorAll('a[target="_blank"]')].map(a => a.rel + " " + a.href), wa: [...document.querySelectorAll('a[href^="https://wa.me/"]')].length, tel: document.querySelector('a[href^="tel:"]').getAttribute("href"), inlineScripts: [...document.scripts].filter(x => !x.src).length, inlineStyle: document.querySelectorAll("[style]").length, forms: document.forms.length, extRes: performance.getEntriesByType("resource").map(r => r.name).filter(n => !n.startsWith(location.origin)), csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]').content }));
-  check("קישורי WhatsApp וטלפון נכונים, וכל קישור חיצוני עם noopener", s.wa >= 3 && s.tel === "tel:+972543547192" && s.ext.every(x => /noopener/.test(x) && /wa\.me\/972543547192|www\.instagram\.com\/alumelbazltd$/.test(x)) && s.ext.filter(x => /instagram/.test(x)).length === 2, s.ext);
+  check("קישורי WhatsApp וטלפון נכונים, וכל קישור חיצוני עם noopener", s.wa >= 3 && s.tel === "tel:+972543547192" && s.ext.every(x => /noopener/.test(x) && /wa\.me\/972543547192|www\.instagram\.com\/alumelbazltd$|^noopener noreferrer https:\/\/easy\.co\.il\/page\/10022152$/.test(x)) && s.ext.filter(x => /instagram/.test(x)).length === 2, s.ext);
   check("אין סקריפט או עיצוב בתוך הדף, אין טפסים, ואין שום משאב מאתר חיצוני", s.inlineScripts === 0 && s.inlineStyle === 0 && s.forms === 0 && s.extRes.length === 0, s);
   const inj = await p.evaluate(async () => { let blocked = 0; document.addEventListener("securitypolicyviolation", () => blocked++); const sc = document.createElement("script"); sc.textContent = "window.__x=1"; document.head.appendChild(sc); const im = new Image(); im.src = "https://example.com/x.png"; document.body.appendChild(im); await new Promise(r => setTimeout(r, 500)); return { ran: !!window.__x, blocked }; });
   check("CSP חוסם סקריפט מוזרק ותמונה מאתר זר", !inj.ran && inj.blocked >= 2, inj);

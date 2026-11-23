@@ -232,9 +232,19 @@ MAIN = '''
 <div class="end" id="contact">
   <div class="ph">{endimg}</div>
   <div class="wrap in">
-    <h2 class="rv" data-i18n="end.h2">מתכננים בית או שיפוץ? נשמח לראות את התוכניות.</h2>
-    <div class="cta"><a class="btn primary" href="{wa}" target="_blank" rel="noopener noreferrer" data-i18n="cta.quote">הצעת מחיר</a><a class="btn ghost" href="tel:+972543547192" dir="ltr">054-354-7192</a></div>
-    <address><a href="mailto:alumelbaz@gmail.com" dir="ltr">alumelbaz@gmail.com</a><span class="ig"><span data-i18n="end.ig">בקרו אותנו גם באינסטגרם:</span> <a href="https://www.instagram.com/alumelbazltd" target="_blank" rel="noopener noreferrer" dir="ltr">@alumelbazltd</a></span><img class="qr" src="assets/ig-qr.png" width="548" height="641" alt="QR: instagram.com/alumelbazltd" loading="lazy" decoding="async"></address>
+    <div class="end-a">
+      <h2 class="rv" data-i18n="end.h2">מתכננים בית או שיפוץ? נשמח לראות את התוכניות.</h2>
+      <div class="cta"><a class="btn primary" href="{wa}" target="_blank" rel="noopener noreferrer" data-i18n="cta.quote">הצעת מחיר</a></div>
+    </div>
+    <address class="end-card rv">
+      <ul class="ways">
+        <li class="tel"><a href="tel:+972543547192"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 3.5h2.5l1.5 4.2-2 1.5a12.5 12.5 0 0 0 6.2 6.2l1.5-2 4.2 1.5v2.5a2.1 2.1 0 0 1-2.3 2.1A16.6 16.6 0 0 1 4.5 5.8a2.1 2.1 0 0 1 2.1-2.3z"/></svg></span><span class="tx"><span class="k" data-i18n="end.call">התקשרו ונשמח להפוך את החלום לחלון&nbsp;(:</span><span class="v"><bdi dir="ltr">054-354-7192</bdi></span></span></a></li>
+        <li><a href="mailto:alumelbaz@gmail.com"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span><span class="tx"><span class="k" data-i18n="end.mail">אימייל</span><span class="v"><bdi dir="ltr">alumelbaz@gmail.com</bdi></span></span></a></li>
+        <li><a href="https://www.instagram.com/alumelbazltd" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><path d="M17.2 6.8h.01"/></svg></span><span class="tx"><span class="k" data-i18n="end.igk">אינסטגרם</span><span class="v"><bdi dir="ltr">@alumelbazltd</bdi></span></span></a></li>
+        <li><a href="https://easy.co.il/page/10022152" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9 6.75 19.6l1-5.8L3.5 9.7l5.9-.9z"/></svg></span><span class="tx"><span class="k" data-i18n="end.easy">דף העסק והביקורות</span><span class="v"><bdi dir="ltr">easy.co.il</bdi></span></span></a></li>
+      </ul>
+      <figure class="qrb"><img class="qr" src="assets/ig-qr.png" width="548" height="641" alt="QR: instagram.com/alumelbazltd" loading="lazy" decoding="async"><figcaption data-i18n="end.qr">סרקו את הקוד בטלפון ועברו לאינסטגרם שלנו</figcaption></figure>
+    </address>
   </div>
 </div>
 </main>
@@ -247,13 +257,6 @@ LB = '''<dialog class="lb" id="lb" aria-label="תצוגת תמונה" data-i18n-
   <figure><img id="lb-img" src="assets/g/windows-001-t.webp" alt="" width="960" height="1200" loading="lazy"><figcaption><span id="lb-cap"></span><span id="lb-n" dir="ltr"></span></figcaption></figure>
   <button type="button" class="lb-b lb-next" aria-label="התמונה הבאה" data-i18n-label="lb.next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
 </dialog>
-'''
-
-PROOF = '''<aside class="proof" id="proof" aria-label="המלצות לקוחות" data-i18n-label="pf.label" hidden>
-  <span class="pf-av" aria-hidden="true"></span>
-  <div class="pf-tx"><p class="pf-1"></p><p class="pf-2"></p></div>
-  <button type="button" class="pf-x" aria-label="סגירת ההמלצות" data-i18n-label="pf.close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-</aside>
 '''
 
 DOC = '''
@@ -280,7 +283,7 @@ index = (HEAD.format(page="", title=T1, desc=D1, tk="", vcss=ver("styles.css"), 
          + MAIN.format(hero=pic("hero", eager=True), wa=WA, tiles=tiles, facts=li(FACTS), gal=gal, steps=li(STEPS), endimg=pic("contact"))
          # אותה גלריה מוטמעת גם בעמוד הבית (מוסתרת), כך שהקישורים "לכל התמונות" מחליפים תצוגה בלי לטעון עמוד
          + WORKS.format(chips=chips, gsecs=gsecs).replace('<main id="main" class="works">', '<section id="wv" class="works" tabindex="-1" hidden>').replace("</main>", "</section>")
-         + PROOF + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
+         + LB + TAIL.format(wa=WA, vsite=ver("site.js")))
 acc = (HEAD.format(page="accessibility.html", title="הצהרת נגישות | אלום אלבז", desc="הצהרת הנגישות של אתר אלום אלבז בע״מ.", tk=' data-title-key="st.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))
        + nav(False) + DOC + TAIL.format(wa=WA, vsite=ver("site.js")))
 works = (HEAD.format(page="works.html", title="העבודות שלנו | אלום אלבז", desc="כל תמונות העבודות של אלום אלבז בע״מ לפי תחום: חלונות, ויטרינות, פרופילים, דלתות, מקלחונים, פרגולות ועוד.", tk=' data-title-key="wk.title"', vcss=ver("styles.css"), vboot=ver("boot.js"))

@@ -37,10 +37,10 @@
       "proc.3t": "Manufacturing", "proc.3p": "Made precisely to measure, with quality control before it leaves.",
       "proc.4t": "Installation and support", "proc.4p": "A professional installation team, an orderly handover and service afterwards.",
       "end.h2": "Planning a home or a renovation? We would love to see the plans.",
-      "end.ig": "Visit us on Instagram too:",
+      "end.call": "Call us, we will gladly turn your dream into a window (:", "end.mail": "Email", "end.igk": "Instagram", "end.easy": "Business page and reviews", "end.qr": "Scan the code with your phone to open our Instagram",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Accessibility statement",
       "lb.label": "Image viewer", "lb.close": "Close", "lb.prev": "Previous image", "lb.next": "Next image", "lb.open": "Enlarge image",
-      "pf.label": "Customer recommendations", "pf.close": "Close recommendations", "fs.on": "Full screen", "fs.off": "Exit full screen", "wa.label": "Message us on WhatsApp", "ig.label": "Our Instagram page", "acc.open": "Accessibility menu",
+      "fs.on": "Full screen", "fs.off": "Exit full screen", "wa.label": "Message us on WhatsApp", "ig.label": "Our Instagram page", "acc.open": "Accessibility menu",
       "acc.title": "Accessibility", "acc.fs": "Larger text", "acc.hc": "High contrast", "acc.ul": "Highlight links", "acc.nomo": "Stop animations", "acc.reset": "Reset", "acc.close": "Close",
       "st.title": "Accessibility statement | Alum Elbaz",
       "st.h1": "Accessibility statement",
@@ -85,10 +85,10 @@
       "proc.3t": "Fabrication", "proc.3p": "Une fabrication précise sur mesure, avec contrôle qualité avant le départ.",
       "proc.4t": "Pose et suivi", "proc.4p": "Une équipe de pose professionnelle, une livraison soignée et un service après.",
       "end.h2": "Un projet de maison ou de rénovation ? Montrez-nous vos plans.",
-      "end.ig": "Retrouvez-nous aussi sur Instagram :",
+      "end.call": "Appelez-nous, nous ferons de votre rêve une fenêtre (:", "end.mail": "E-mail", "end.igk": "Instagram", "end.easy": "Fiche de l'entreprise et avis", "end.qr": "Scannez le code avec votre téléphone pour ouvrir notre Instagram",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Déclaration d'accessibilité",
       "lb.label": "Visionneuse d'images", "lb.close": "Fermer", "lb.prev": "Image précédente", "lb.next": "Image suivante", "lb.open": "Agrandir l'image",
-      "pf.label": "Recommandations de clients", "pf.close": "Fermer les recommandations", "fs.on": "Plein écran", "fs.off": "Quitter le plein écran", "wa.label": "Écrivez-nous sur WhatsApp", "ig.label": "Notre page Instagram", "acc.open": "Menu d'accessibilité",
+      "fs.on": "Plein écran", "fs.off": "Quitter le plein écran", "wa.label": "Écrivez-nous sur WhatsApp", "ig.label": "Notre page Instagram", "acc.open": "Menu d'accessibilité",
       "acc.title": "Accessibilité", "acc.fs": "Texte plus grand", "acc.hc": "Contraste élevé", "acc.ul": "Souligner les liens", "acc.nomo": "Arrêter les animations", "acc.reset": "Réinitialiser", "acc.close": "Fermer",
       "st.title": "Déclaration d'accessibilité | Alum Elbaz",
       "st.h1": "Déclaration d'accessibilité",
@@ -196,70 +196,6 @@
     });
     applyPrefs();
   }
-
-  /* ---- הודעות המלצה קופצות ----
-     PROOF = לקוחות אמיתיים בלבד (ראשי תיבות, עיר, מה הוזמן, ומשפט המלצה אם יש). כל עוד הרשימה ריקה, לא מוצג כלום.
-     PROOF_DEMO = נתוני הדגמה מומצאים, מוצגים רק עם ?proof=demo ורק עם התווית "דוגמה". לא להעביר אותם ל-PROOF. */
-  var PROOF = [
-    /* נמסרו ע"י מתניה 12/11/2026. מה הוזמן ומשפט המלצה: להוסיף כשיימסרו (item / q). */
-    { i: "ד.ט.", il: "D.T.", g: "m", city: ["קריית נטפים", "Kiryat Netafim", "Kiryat Netafim"] },
-    { org: ["מועצה מקומית קדומים", "Kedumim Local Council", "Conseil local de Kedumim"], i: "ק", il: "K" }
-  ];
-  var PROOF_DEMO = [
-    { i: "מ.ג.", il: "M.G.", g: "m", city: ["הוד השרון", "Hod HaSharon", "Hod HaSharon"], item: "windows" },
-    { i: "ר.כ.", il: "R.K.", g: "f", city: ["רעננה", "Ra'anana", "Ra'anana"], item: "pergola", q: ["עבודה נקייה ומדויקת", "Clean, precise work", "Un travail propre et précis"] },
-    { i: "ד.ל.", il: "D.L.", g: "m", city: ["מודיעין", "Modi'in", "Modi'in"], item: "shower" },
-    { i: "ש.א.", il: "S.A.", g: "f", city: ["חיפה", "Haifa", "Haïfa"], item: "vitrine", q: ["הגיעו בזמן וסיימו ביום אחד", "On time and finished in one day", "À l'heure et terminé en une journée"] },
-    { i: "י.ב.", il: "Y.B.", g: "m", city: ["אשדוד", "Ashdod", "Ashdod"], item: "doors" },
-    { i: "נ.ח.", il: "N.H.", g: "f", city: ["ירושלים", "Jerusalem", "Jérusalem"], item: "fence" }
-  ];
-  var PF_ITEM = {
-    windows: ["חלונות", "windows", "des fenêtres"], pergola: ["פרגולה", "a pergola", "une pergola"], shower: ["מקלחון", "a shower enclosure", "une paroi de douche"],
-    vitrine: ["ויטרינה", "a glazed wall", "une baie vitrée"], doors: ["דלתות", "doors", "des portes"], fence: ["גדר", "a fence", "une clôture"], shutters: ["תריסים", "shutters", "des volets"]
-  };
-  (function () {
-    var box = document.getElementById("proof"); if (!box) return;
-    var demo = false; try { demo = new URLSearchParams(location.search).get("proof") === "demo"; } catch (e) {}
-    var list = (demo ? PROOF_DEMO : PROOF).slice(); if (!list.length) return;
-    try { if (sessionStorage.getItem("ae_proof_off") === "1") return; } catch (e) {}
-    var SHOW = 6000, GAP = demo ? 5000 : 15000, n = 0, timer = null, off = false, started = false;
-    for (var k = list.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)), x = list[k]; list[k] = list[j]; list[j] = x; }
-    var av = box.querySelector(".pf-av"), l1 = box.querySelector(".pf-1"), l2 = box.querySelector(".pf-2");
-    function quiet() { return d.classList.contains("nomo") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); }
-    function fill(c) {
-      var li = AE.lang === "en" ? 1 : AE.lang === "fr" ? 2 : 0, item = (PF_ITEM[c.item] || ["", "", ""])[li], city = c.city ? c.city[li] : "", who = li ? c.il : c.i;
-      av.textContent = (li ? c.il : c.i).replace(/\./g, "");
-      if (c.org) l1.textContent = c.org[li];
-      else if (!item) l1.textContent = li === 0 ? who + " מ" + city : li === 1 ? who + " from " + city : who + ", de " + city;
-      else l1.textContent = li === 0 ? who + " מ" + city + (c.g === "f" ? " הזמינה " : " הזמין ") + item
-        : li === 1 ? who + " from " + city + " ordered " + item : who + ", de " + city + ", a commandé " + item;
-      if (demo) { var b = document.createElement("span"); b.className = "pf-demo"; b.textContent = ["דוגמה", "Sample", "Exemple"][li]; l1.appendChild(b); }
-      l2.textContent = c.q ? "“" + c.q[li] + "”"
-        : c.org ? ["בין הלקוחות שלנו", "Among our clients", "Parmi nos clients"][li]
-        : !item ? [c.g === "f" ? "לקוחה של אלום אלבז" : "לקוח של אלום אלבז", "An Alum Elbaz client", "Client d'Alum Elbaz"][li]
-        : li === 0 ? (c.g === "f" ? "ממליצה בחום" : "ממליץ בחום") : li === 1 ? "Highly recommends us" : "Nous recommande vivement";
-    }
-    function hide(next) { box.classList.remove("on"); timer = setTimeout(function () { box.hidden = true; if (next && !off) timer = setTimeout(show, GAP); }, 550); }
-    function show() {
-      if (off) return;
-      if (quiet() || (document.getElementById("acc-panel") && !document.getElementById("acc-panel").hidden)) { timer = setTimeout(show, GAP); return; }
-      fill(list[n % list.length]); n++; box.hidden = false;
-      requestAnimationFrame(function () { requestAnimationFrame(function () { box.classList.add("on"); }); });
-      timer = setTimeout(function () { hide(true); }, SHOW);
-    }
-    box.querySelector(".pf-x").addEventListener("click", function () { off = true; clearTimeout(timer); hide(false); try { sessionStorage.setItem("ae_proof_off", "1"); } catch (e) {} });
-    box.addEventListener("mouseenter", function () { if (box.classList.contains("on")) clearTimeout(timer); });
-    box.addEventListener("mouseleave", function () { if (box.classList.contains("on") && !off) { clearTimeout(timer); timer = setTimeout(function () { hide(true); }, 2500); } });
-    /* ההודעה הראשונה רק אחרי שהגולש התחיל לגלול */
-    var sentinel = document.getElementById("services");
-    if (sentinel) {
-      var onScroll = function () {
-        if (started || (window.pageYOffset || d.scrollTop) < 160) return;
-        started = true; window.removeEventListener("scroll", onScroll); timer = setTimeout(show, 1500);
-      };
-      window.addEventListener("scroll", onScroll, { passive: true });
-    }
-  })();
 
   /* ---- מסך מלא ---- */
   var fsb = document.getElementById("fsb"), fsEl = document.documentElement;
