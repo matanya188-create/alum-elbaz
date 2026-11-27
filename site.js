@@ -39,7 +39,7 @@
       "end.h2": "Planning a home or a renovation? We would love to see the plans.",
       "end.call": "Call us, we will be happy to help (:", "end.mail": "Email", "end.igk": "Instagram", "end.easy": "Business page and reviews", "end.qr": "Scan the code with your phone to open our Instagram",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Accessibility statement",
-      "lb.label": "Image viewer", "lb.close": "Close", "lb.prev": "Previous image", "lb.next": "Next image", "lb.open": "Enlarge image",
+      "lb.label": "Image viewer", "lb.close": "Close", "lb.prev": "Previous image", "lb.next": "Next image", "lb.open": "Enlarge image", "lb.ask": "Interested? Send us this photo", "lb.msg": "Hello, I saw this project on your website and I am interested in something similar:", "lb.pic": "photo",
       "fs.on": "Full screen", "fs.off": "Exit full screen", "wa.label": "Message us on WhatsApp", "ig.label": "Our Instagram page", "acc.open": "Accessibility menu",
       "acc.title": "Accessibility", "acc.fs": "Larger text", "acc.hc": "High contrast", "acc.ul": "Highlight links", "acc.nomo": "Stop animations", "acc.reset": "Reset", "acc.close": "Close",
       "st.title": "Accessibility statement | Alum Elbaz",
@@ -87,7 +87,7 @@
       "end.h2": "Un projet de maison ou de rénovation ? Montrez-nous vos plans.",
       "end.call": "Appelez-nous, nous serons ravis de vous aider (:", "end.mail": "E-mail", "end.igk": "Instagram", "end.easy": "Fiche de l'entreprise et avis", "end.qr": "Scannez le code avec votre téléphone pour ouvrir notre Instagram",
       "foot.co": "Alum Elbaz Ltd.", "foot.a11y": "Déclaration d'accessibilité",
-      "lb.label": "Visionneuse d'images", "lb.close": "Fermer", "lb.prev": "Image précédente", "lb.next": "Image suivante", "lb.open": "Agrandir l'image",
+      "lb.label": "Visionneuse d'images", "lb.close": "Fermer", "lb.prev": "Image précédente", "lb.next": "Image suivante", "lb.open": "Agrandir l'image", "lb.ask": "Intéressé ? Envoyez-nous cette photo", "lb.msg": "Bonjour, j'ai vu cette réalisation sur votre site et je suis intéressé par quelque chose de similaire :", "lb.pic": "photo",
       "fs.on": "Plein écran", "fs.off": "Quitter le plein écran", "wa.label": "Écrivez-nous sur WhatsApp", "ig.label": "Notre page Instagram", "acc.open": "Menu d'accessibilité",
       "acc.title": "Accessibilité", "acc.fs": "Texte plus grand", "acc.hc": "Contraste élevé", "acc.ul": "Souligner les liens", "acc.nomo": "Arrêter les animations", "acc.reset": "Réinitialiser", "acc.close": "Fermer",
       "st.title": "Déclaration d'accessibilité | Alum Elbaz",
@@ -275,12 +275,19 @@
   (function () {
     var lb = document.getElementById("lb"), all = document.querySelectorAll(".zoom"), zs = all;
     if (!lb || !all.length || !lb.showModal) return;
-    var im = document.getElementById("lb-img"), cap = document.getElementById("lb-cap"), cnt = document.getElementById("lb-n"), cur = 0, x0 = null;
+    var im = document.getElementById("lb-img"), cap = document.getElementById("lb-cap"), cnt = document.getElementById("lb-n"), wa = document.getElementById("lb-wa"), cur = 0, x0 = null;
     function go(i) {
       cur = (i + zs.length) % zs.length;
       var src = zs[cur].firstElementChild, big = src.getAttribute("data-full");
       if (im.getAttribute("src") !== big) { im.classList.add("sw"); im.setAttribute("src", big); }
       im.alt = src.alt; cap.textContent = src.alt.replace(/ \d+$/, ""); cnt.textContent = (cur + 1) + " / " + zs.length;
+      /* כפתור "מתעניין": הודעת WhatsApp מוכנה עם שם התחום, מספר התמונה וקישור שפותח אותה באתר */
+      if (wa) {
+        var m = /([a-z]+)-0*(\d+)\.webp$/.exec(big || ""), dict = T[AE.lang] || {}, NL = String.fromCharCode(10);
+        var txt = (dict["lb.msg"] || "שלום, ראיתי באתר שלכם את העבודה הזאת ואני מתעניין במשהו דומה:") + NL + cap.textContent + ", " + (dict["lb.pic"] || "תמונה") + " " + (cur + 1)
+          + (m ? NL + "https://alum-elbaz.co.il/?view=works&cat=" + m[1] + "&img=" + m[2] : "");
+        wa.setAttribute("href", "https://wa.me/972543547192?text=" + encodeURIComponent(txt));
+      }
     }
     function step(n) { go(cur + n); }
     im.addEventListener("load", function () { im.classList.remove("sw"); });
@@ -311,6 +318,15 @@
       if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null;
       if (Math.abs(dx) > 45) step((dx > 0) === (d.dir === "rtl") ? 1 : -1);
     }, { passive: true });
+    /* קישור ישיר לתמונה מסוימת: ?cat=showers&img=12 פותח אותה מוגדלת */
+    try {
+      var q = new URLSearchParams(location.search), qc = q.get("cat"), qi = parseInt(q.get("img"), 10);
+      if (qc && /^[a-z]+$/.test(qc) && qi > 0) {
+        var sec = document.getElementById("g-" + qc), want = new RegExp("/" + qc + "-0*" + qi + "[.]webp$");
+        if (sec && !sec.hidden && sec.offsetParent !== null) Array.prototype.some.call(sec.querySelectorAll(".zoom"), function (z) {
+          if (!want.test(z.firstElementChild.getAttribute("data-full") || "")) return false; z.click(); return true; });
+      }
+    } catch (e) {}
   })();
 
   /* ---- ספירה של מספר השנים, פעם אחת כשהוא נכנס למסך ---- */

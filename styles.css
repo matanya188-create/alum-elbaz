@@ -103,10 +103,12 @@ html.lb-open{overflow:hidden}
 .lb[open]::backdrop{background:rgba(8,9,10,.94)}
 @starting-style{.lb[open]::backdrop{background:rgba(8,9,10,0)}}
 .lb figure{display:grid;gap:10px;justify-items:center;max-width:100%}
-.lb figure img{width:auto;height:auto;max-width:100%;max-height:calc(100dvh - 130px);object-fit:contain;border-radius:var(--r);transition:opacity .2s ease}
+.lb figure img{width:auto;height:auto;max-width:100%;max-height:calc(100dvh - 196px);object-fit:contain;border-radius:var(--r);transition:opacity .2s ease}
 .lb figure img.sw{opacity:0}
 .lb figcaption{display:flex;gap:14px;align-items:baseline;font-size:.95rem}
 .lb figcaption #lb-n{color:var(--muted);font-size:.85rem}
+.lb-wa{min-height:48px;padding:0 22px;margin-top:2px;max-width:100%;white-space:normal;text-align:center}
+.lb-wa svg{width:21px;height:21px;flex:none}
 .lb-b{position:fixed;z-index:1;width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:rgba(29,33,37,.92);border:1px solid #4a5159;color:var(--text)}
 .lb-b svg{width:22px;height:22px}
 .lb-x{top:10px;inset-inline-end:12px}

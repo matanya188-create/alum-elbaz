@@ -273,6 +273,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   p = await open("index.html", 390, 844); await p.click(".menu-btn"); await sleep(300);
   s = await p.evaluate(() => getComputedStyle(document.getElementById("fsb")).display);
   check("מסך מלא: הכפתור מוסתר כשתפריט הטלפון פתוח", s === "none", s); await p.browserContext().close();
+  // ----- כפתור "מתעניין" וקישור ישיר לתמונה -----
+  p = await open("index.html?view=works&cat=showers&img=12", 390, 844); await sleep(900);
+  s = await p.evaluate(() => { const a = document.getElementById("lb-wa"), r = a.getBoundingClientRect(), im = document.getElementById("lb-img").getBoundingClientRect(); return { open: document.getElementById("lb").open, src: document.getElementById("lb-img").getAttribute("src"), href: a.getAttribute("href"), txt: decodeURIComponent(a.getAttribute("href").split("?text=")[1] || ""), rel: a.rel, inView: r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && r.height >= 44, clear: im.bottom <= r.top + 1 }; });
+  check("קישור ישיר ?cat=showers&img=12 פותח את התמונה מוגדלת", s.open && /showers-012\.webp$/.test(s.src), s);
+  check("כפתור 'מתעניין': הודעת WhatsApp עם התחום, מספר התמונה וקישור אליה, בתוך המסך ומתחת לתמונה", /^https:\/\/wa\.me\/972543547192\?text=/.test(s.href) && s.txt.split("\n").length === 3 && /מקלחונים, תמונה 12$/.test(s.txt.split("\n")[1]) && s.txt.split("\n")[2] === "https://alum-elbaz.co.il/?view=works&cat=showers&img=12" && /noopener/.test(s.rel) && s.inView && s.clear, s);
+  await p.keyboard.press("ArrowLeft"); await sleep(500);
+  s = await p.evaluate(() => decodeURIComponent(document.getElementById("lb-wa").getAttribute("href")));
+  check("כפתור 'מתעניין': הקישור מתעדכן כשמדפדפים לתמונה הבאה", /img=13$/.test(s) && /תמונה 13\n/.test(s), s);
+  await axe(p, "תמונה מוגדלת עם כפתור מתעניין");
+  await p.browserContext().close();
+  p = await open("index.html?view=works&cat=showers&img=9999", 800, 700); await sleep(600);
+  check("קישור ישיר למספר תמונה שלא קיים: לא נפתח כלום ואין שגיאה", await p.evaluate(() => !document.getElementById("lb").open && !document.getElementById("wv").hidden));
+  await p.browserContext().close();
   // ----- לוגו -----
   for (const w of [320, 390, 1440]) { p = await open("index.html", w, 800); await scrollAll(p);
     s = await p.evaluate(() => { const m = document.querySelector(".logo img"), f = document.querySelector("footer .brand img"), r = m.getBoundingClientRect(); return { mark: m.complete && m.naturalWidth > 0, h: Math.round(r.height), inNav: r.top >= 0 && r.bottom <= 80, full: f.complete && f.naturalWidth > 0, fw: Math.round(f.getBoundingClientRect().width), name: document.querySelector(".logo").textContent.trim() }; });
